@@ -60,6 +60,12 @@ const STORAGE_KEYS = [
 ]
 
 const ANALYTICS_EVENTS = [
+	'todoist_view_selected',
+	'todoist_calendar_opened',
+	'todoist_calendar_load_failed',
+	'todoist_calendar_connection_opened',
+	'todoist_calendar_event_opened',
+
 	'todoist_token_help_opened',
 	'todoist_opened',
 	'todoist_synced',

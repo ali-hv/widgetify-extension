@@ -17,3 +17,13 @@ For custom recurrence the expression supplies its date and time, so the separate
 The empty list and a failed load with no visible tasks use the shared WidgetEmpty and WidgetError components, keeping their retry and task artwork consistent with the existing task widget.
 
 The owner requested 3x3, 4x3 and 4x5 in addition to 2x3 after checking the built widget. These sizes keep the approved list and editor layout and expand its available width and height.
+
+## Task views and calendar
+
+The owner accepted the task-view proposal with one correction: center each filter label within its selected pill. [The corrected proposal](assets/task-views.png) centers the text using its measured bounds. `art/task-views.py` draws this reference; the implementation uses TabNavigation, whose buttons center their labels with flex.
+
+Today is the default and shows only tasks due today. Tomorrow shows only tasks due tomorrow. Upcoming includes all active tasks, including overdue and undated ones. The existing project filter applies to tasks in each view. New tasks inherit Today or Tomorrow while adding from that view.
+
+Google Calendar events form a separate section below tasks and open in Google Calendar. The integration reuses Widgetify's Google connection and requires its own Widgetify sign-in and Google authorization; the Todoist token cannot read native calendar events. Upcoming calendar events cover the next 30 days, while Upcoming tasks have no date limit. Signed-out and disconnected states offer the existing connection flow. Errors leave tasks visible.
+
+Visual checks: centered text on each selected tab at every widget size, long project names, empty Today/Tomorrow, midnight changes, all-day and overnight calendar events, signed-out Google connection, expired Google authorization, and glass/icy dropdowns.

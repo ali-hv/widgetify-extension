@@ -1,4 +1,21 @@
 export const todoist = {
+	'todoist.today': 'امروز',
+	'todoist.tomorrow': 'فردا',
+	'todoist.upcoming': 'پیش رو',
+	'todoist.todayEmpty': 'برای امروز تسکی نداری',
+	'todoist.tomorrowEmpty': 'برای فردا تسکی نداری',
+	'todoist.calendarTitle': 'رویدادهای تقویم گوگل',
+	'todoist.calendarUpcoming': 'تقویم گوگل · ۳۰ روز آینده',
+	'todoist.calendarConnectHint': 'برای دیدن رویدادها، گوگل رو در ویجتیفای هم وصل کن',
+	'todoist.calendarConnect': 'اتصال تقویم گوگل',
+	'todoist.calendarSignIn': 'ورود و اتصال تقویم گوگل',
+	'todoist.calendarRetry': 'دوباره امتحان کن',
+	'todoist.calendarError': 'نتونستیم رویدادهای تقویم رو بیاریم، تسک‌هات هنوز اینجان',
+	'todoist.calendarEmpty': 'توی این بازه رویدادی نداری',
+	'todoist.calendarUntitled': 'رویداد بدون عنوان',
+	'todoist.calendarAllDay': 'تمام روز',
+	'todoist.calendarTime': '{start} تا {end}',
+
 	'todoist.customRepeatHint':
 		'تاریخ و ساعت رو توی همین عبارت انگلیسی بنویس، یا یکی از تکرارهای آماده رو انتخاب کن',
 	'todoist.repeatExample': 'every 2 weeks',

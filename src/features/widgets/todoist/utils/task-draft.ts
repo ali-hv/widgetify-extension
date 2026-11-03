@@ -15,8 +15,12 @@ interface TaskDraft {
 	dueChanged: boolean
 }
 
-export function createTaskDraft(task: TodoistTask | null, project: string): TaskDraft {
-	let date = task?.due?.date.slice(0, 10) ?? ''
+export function createTaskDraft(
+	task: TodoistTask | null,
+	project: string,
+	initialDate = ''
+): TaskDraft {
+	let date = task ? (task.due?.date.slice(0, 10) ?? '') : initialDate
 	let time = task?.due?.date.includes('T') ? task.due.date.slice(11, 16) : ''
 	if (task?.due && /(?:Z|[+-]\d{2}:\d{2})$/.test(task.due.date)) {
 		const parts = new Intl.DateTimeFormat('en-CA', {
@@ -44,7 +48,7 @@ export function createTaskDraft(task: TodoistTask | null, project: string): Task
 		time,
 		recurrence: task?.due?.is_recurring ? task.due.string : '',
 		originalDue: task?.due ?? null,
-		dueChanged: false,
+		dueChanged: !task && Boolean(initialDate),
 	}
 }
 

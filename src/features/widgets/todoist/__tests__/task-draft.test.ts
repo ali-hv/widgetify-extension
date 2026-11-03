@@ -22,6 +22,15 @@ const task: TodoistTask = {
 }
 
 describe('Todoist schedule editing', () => {
+	it('seeds a new task with the selected Today or Tomorrow date, without rescheduling an existing task', () => {
+		expect(taskDraftInput(createTaskDraft(null, 'inbox', '2026-11-05')).due).toEqual({
+			date: '2026-11-05',
+			timezone: null,
+		})
+		expect(
+			taskDraftInput(createTaskDraft({ ...task, due: null }, 'inbox', '2026-11-05'))
+		).not.toHaveProperty('due')
+	})
 	it('omits due when a title changes so Todoist preserves the recurrence and timezone', () => {
 		const draft = createTaskDraft(task, 'inbox')
 		draft.content = 'Read more'

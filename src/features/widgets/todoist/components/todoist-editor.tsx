@@ -22,6 +22,7 @@ interface TodoistEditorProps {
 	task: TodoistTask | null
 	snapshot: TodoistSnapshot
 	initialProject: string
+	initialDate: string
 	busy: boolean
 	onSave: (input: TodoistTaskInput) => void
 	onDelete: () => void
@@ -32,6 +33,7 @@ export function TodoistEditor({
 	task,
 	snapshot,
 	initialProject,
+	initialDate,
 	busy,
 	onSave,
 	onDelete,
@@ -44,7 +46,8 @@ export function TodoistEditor({
 			initialProject ||
 				snapshot.projects.find((project) => project.is_inbox_project)?.id ||
 				snapshot.projects[0]?.id ||
-				''
+				'',
+			initialDate
 		)
 	)
 	const [confirmDelete, setConfirmDelete] = useState(false)

@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
-import { getMainClient } from '../api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { FRESH_REQUEST, getMainClient } from '../api'
 import { dateKeys } from '@/services/date/date.keys'
 
 export interface GoogleCalendarEvent {
@@ -79,13 +79,32 @@ export const useGetGoogleCalendarEvents = (
 	})
 }
 
+export function useRefreshGoogleCalendarEvents(
+	enabled: boolean,
+	startDate: string,
+	endDate: string
+) {
+	const client = useQueryClient()
+	return () =>
+		enabled
+			? client.fetchQuery({
+					queryKey: dateKeys.googleCalendarEvents(startDate, endDate),
+					queryFn: () => getGoogleCalendarEvents(startDate, endDate, true),
+					staleTime: 0,
+					retry: false,
+				})
+			: Promise.resolve([])
+}
+
 async function getGoogleCalendarEvents(
 	startDate: string,
-	endDate?: string
+	endDate?: string,
+	fresh = false
 ): Promise<GoogleCalendarEvent[]> {
 	const client = getMainClient()
 	const { data } = await client.get<GoogleCalendarResponse>(
-		`/google/events?start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate ?? '')}`
+		`/google/events?start=${encodeURIComponent(startDate)}&end=${encodeURIComponent(endDate ?? '')}`,
+		fresh ? FRESH_REQUEST : undefined
 	)
 	return data.events || []
 }

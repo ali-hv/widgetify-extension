@@ -1,3 +1,16 @@
+import { useAuth } from '@/context/auth.context'
+import { useGeneralSetting } from '@/context/general-setting.context'
+import { nowDate, onClockCorrected } from '@/common/utils/trusted-time'
+import {
+	useGetGoogleCalendarEvents,
+	useRefreshGoogleCalendarEvents,
+} from '@/services/date/get-google-calendar-events.hook'
+import { TodoistCalendar } from './components/todoist-calendar'
+import {
+	filterTodoistTasks,
+	todoistDateRange,
+	type TodoistTaskView,
+} from './utils/task-view'
 import { WidgetEmpty } from '../components/widget-empty'
 import { WidgetError } from '../components/widget-error'
 import { TodoistTaskList } from './components/todoist-task-list'
@@ -9,6 +22,7 @@ import {
 	Button,
 	PopoverMenuItem,
 	SelectBox,
+	TabNavigation,
 	Spinner,
 	TextInput,
 	Tooltip,
@@ -31,6 +45,40 @@ function errorMessage(code: string) {
 
 export function TodoistWidget() {
 	const { view, busy, ready, error, perform } = useTodoist()
+	const { user, isAuthenticated } = useAuth()
+	const { selected_timezone } = useGeneralSetting()
+	const timezone = selected_timezone.value
+	const [taskView, setTaskView] = useState<TodoistTaskView>('today')
+	const [now, setNow] = useState(nowDate)
+	const range = todoistDateRange(taskView, now, timezone)
+	const calendarConnected = isAuthenticated && !!user?.connections?.includes('google')
+	const calendarEnabled = calendarConnected && !!view?.connected
+	const calendar = useGetGoogleCalendarEvents(calendarEnabled, range.start, range.end)
+	const refreshCalendar = useRefreshGoogleCalendarEvents(
+		calendarEnabled,
+		range.start,
+		range.end
+	)
+	useEffect(() => {
+		const update = () => setNow(nowDate())
+		const timer = setInterval(update, 30000)
+		const stop = onClockCorrected(update)
+		return () => {
+			clearInterval(timer)
+			stop()
+		}
+	}, [])
+	useEffect(() => {
+		if (calendarEnabled) Analytics.event('todoist_calendar_opened')
+	}, [calendarEnabled])
+	useEffect(() => {
+		if (calendarEnabled && calendar.isError)
+			Analytics.event('todoist_calendar_load_failed')
+	}, [calendarEnabled, calendar.isError, calendar.errorUpdatedAt])
+	const retryCalendar = () => {
+		void refreshCalendar().catch(() => {})
+	}
+
 	const [token, setToken] = useState('')
 	const [project, setProject] = useState('')
 	const [editor, setEditor] = useState<{
@@ -63,6 +111,7 @@ export function TodoistWidget() {
 	const manualSync = () => {
 		Analytics.event('todoist_sync_clicked')
 		void perform({ action: 'sync' })
+		retryCalendar()
 	}
 	useWidgetMenuActions(
 		connected ? (
@@ -90,13 +139,19 @@ export function TodoistWidget() {
 			</>
 		) : null
 	)
-	const tasks =
-		snapshot?.items.filter(
-			(task) =>
-				!task.checked &&
-				!task.is_deleted &&
-				(!project || task.project_id === project)
-		) ?? []
+	const tasks = filterTodoistTasks(
+		snapshot?.items ?? [],
+		taskView,
+		range.day,
+		timezone,
+		project
+	)
+	const emptyMessage =
+		taskView === 'today'
+			? t('todoist.todayEmpty')
+			: taskView === 'tomorrow'
+				? t('todoist.tomorrowEmpty')
+				: t('todoist.empty')
 	const showConnection = !disconnecting && (!connected || reconnect || error === 'auth')
 	return (
 		<>
@@ -240,6 +295,25 @@ export function TodoistWidget() {
 							</section>
 						) : (
 							<>
+								<TabNavigation<TodoistTaskView>
+									tabMode="simple"
+									size="md"
+									className="w-full h-10 shrink-0"
+									activeBgClass="bg-brand-fill"
+									activeTextClass="text-brand"
+									activeTab={taskView}
+									onTabClick={(next) => {
+										setTaskView(next)
+										Analytics.event('todoist_view_selected', {
+											view: next,
+										})
+									}}
+									tabs={[
+										{ id: 'today', label: t('todoist.today') },
+										{ id: 'tomorrow', label: t('todoist.tomorrow') },
+										{ id: 'upcoming', label: t('todoist.upcoming') },
+									]}
+								/>
 								<SelectBox
 									label={t('todoist.projectFilter')}
 									value={project}
@@ -262,6 +336,9 @@ export function TodoistWidget() {
 										task={editor.task}
 										snapshot={snapshot}
 										initialProject={project}
+										initialDate={
+											taskView === 'upcoming' ? '' : range.day
+										}
 										busy={busy}
 										onCancel={() => setEditor(null)}
 										onSave={async (input) => {
@@ -300,7 +377,7 @@ export function TodoistWidget() {
 											) : (
 												<WidgetEmpty
 													art="tasks"
-													description={t('todoist.empty')}
+													description={emptyMessage}
 												/>
 											))}
 										{snapshot && (
@@ -328,6 +405,17 @@ export function TodoistWidget() {
 										>
 											{t('todoist.add')}
 										</Button>
+										<TodoistCalendar
+											view={taskView}
+											timezone={timezone}
+											range={range}
+											isAuthenticated={isAuthenticated}
+											connected={calendarConnected}
+											events={calendar.data}
+											loading={calendar.isFetching}
+											error={calendar.isError}
+											onRetry={retryCalendar}
+										/>
 									</>
 								)}
 							</>
