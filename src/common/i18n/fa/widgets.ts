@@ -1,4 +1,7 @@
 export const widgets = {
+	'widgets.combo.tabLoadFailed':
+		'نتونستیم تب انتخابی‌ت رو بخونیم، صفحه رو دوباره باز کن',
+	'widgets.combo.tabSaveFailed': 'تب انتخابی ذخیره نشد، دوباره امتحان کن',
 	'widgets.notes.toast.deleted': 'یادداشت حذف شد',
 	'widgets.notes.priority.high': 'اولویت مهم',
 	'widgets.notes.priority.medium': 'اولویت متوسط',

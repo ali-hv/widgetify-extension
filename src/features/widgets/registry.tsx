@@ -265,7 +265,12 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		order: 4,
 		canToggle: true,
 		popular: true,
-		allowedSizes: [{ w: 2, h: 3 }],
+		allowedSizes: [
+			{ w: 2, h: 3 },
+			{ w: 2, h: 4 },
+			{ w: 2, h: 5 },
+			{ w: 2, h: 6 },
+		],
 		defaultSize: { w: 2, h: 3 },
 		settingsTab: WidgetTabKeys.combo_settings,
 		canDuplicate: false,

@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react'
 import { t } from '@/common/i18n'
-import { getFromStorage, setToStorage } from '@/common/storage'
-import { TabNavigation } from '@/components/ui'
+import { Spinner, TabNavigation } from '@/components/ui'
 import { Icon } from '@/icons'
 import { WidgetSettingWrapper } from '@/features/widgets/components/widget-settings-wrapper'
 import { RssFeedSetting } from '../news/news-setting'
 import { WigiArzSetting } from '../wigi-arz/wigi-arz-setting'
 
-type ComboSettingTab = 'currency' | 'news'
+import type { ComboTabType } from './types'
+import { useComboTab } from './hooks/use-combo-tab'
 
 interface ComboSettingProps {
 	instanceId?: string
@@ -15,31 +14,23 @@ interface ComboSettingProps {
 }
 
 export function ComboSetting({ instanceId, size }: ComboSettingProps) {
-	const [activeTab, setActiveTab] = useState<ComboSettingTab>('currency')
-
-	useEffect(() => {
-		async function load() {
-			const savedTab = await getFromStorage('comboTabs')
-			if (savedTab === 'news' || savedTab === 'currency') {
-				setActiveTab(savedTab)
-			}
-		}
-
-		load()
-	}, [])
-
-	const handleTabChange = (tab: ComboSettingTab) => {
-		setActiveTab(tab)
-		setToStorage('comboTabs', tab)
-	}
+	const { activeTab, selectTab } = useComboTab('settings')
+	if (activeTab === null)
+		return (
+			<WidgetSettingWrapper>
+				<div className="flex items-center justify-center h-[30rem]">
+					<Spinner size="sm" />
+				</div>
+			</WidgetSettingWrapper>
+		)
 
 	return (
 		<WidgetSettingWrapper>
 			<div className="flex flex-col gap-4">
-				<TabNavigation<ComboSettingTab>
+				<TabNavigation<ComboTabType>
 					tabMode="simple"
 					activeTab={activeTab}
-					onTabClick={handleTabChange}
+					onTabClick={selectTab}
 					tabs={[
 						{
 							id: 'currency',

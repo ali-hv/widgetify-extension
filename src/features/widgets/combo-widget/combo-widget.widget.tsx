@@ -1,22 +1,18 @@
-import { useEffect, useState } from 'react'
-import Analytics from '@/analytics'
 import { t } from '@/common/i18n'
-import { getFromStorage, setToStorage } from '@/common/storage'
-import { PopoverMenuItem } from '@/components/ui'
+import { PopoverMenuItem, Spinner } from '@/components/ui'
 import { NewsComboView } from '@/features/widgets/news/news.widget'
 import { WigiArzComboView } from '@/features/widgets/wigi-arz/wigi-arz.widget'
 import { Icon } from '@/icons'
 import { useRefreshCurrencies } from '@/services/currency/get-currency-by-code.hook'
 import { useRefreshRssFeeds } from '@/services/news/get-news.hook'
 import { WidgetContainer } from '../components/widget-container'
-import { WidgetHeaderTabs } from '../components/widget-header'
+import { WidgetHeader, WidgetHeaderTabs } from '../components/widget-header'
 import { useWidgetMenuActions, useWidgetSettingsSummary } from '../widget-menu.context'
-import { COMBO_TAB_LIST, DEFAULT_COMBO_TAB } from './constants'
-import type { ComboTabType } from './types'
-import { normalizeComboTab } from './utils/normalize-combo-tab'
+import { COMBO_TAB_LIST } from './constants'
+import { useComboTab } from './hooks/use-combo-tab'
 
 export function ComboWidget() {
-	const [activeTab, setActiveTab] = useState<ComboTabType>(DEFAULT_COMBO_TAB)
+	const { activeTab, selectTab } = useComboTab('widget')
 	const { refresh: refreshCurrencies } = useRefreshCurrencies()
 	const { refresh: refreshNews } = useRefreshRssFeeds()
 
@@ -29,28 +25,22 @@ export function ComboWidget() {
 		/>
 	)
 
-	useEffect(() => {
-		async function load() {
-			const storedTab = await getFromStorage('comboTabs')
-			setActiveTab(normalizeComboTab(storedTab))
-		}
-
-		load()
-	}, [])
-
-	const onTabClick = (tab: ComboTabType) => {
-		if (tab === activeTab) return
-		setActiveTab(tab)
-		setToStorage('comboTabs', tab)
-		Analytics.event('combo_tab_changed', { tab })
-	}
+	if (activeTab === null)
+		return (
+			<WidgetContainer contentClassName="p-3 gap-2">
+				<WidgetHeader title={t('widgets.combo.menuLabel')} />
+				<div className="flex items-center justify-center flex-1">
+					<Spinner size="sm" />
+				</div>
+			</WidgetContainer>
+		)
 
 	const tabs = (
 		<WidgetHeaderTabs
 			label={t('widgets.combo.menuLabel')}
 			tabs={COMBO_TAB_LIST}
 			activeTab={activeTab}
-			onChange={onTabClick}
+			onChange={selectTab}
 		/>
 	)
 

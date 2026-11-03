@@ -18,5 +18,8 @@ describe('normalizeComboTab', () => {
 	it('rejects a value that is not a tab instead of trusting storage', () => {
 		expect(normalizeComboTab('nonsense')).toBe(DEFAULT_COMBO_TAB)
 		expect(normalizeComboTab('NEWS')).toBe(DEFAULT_COMBO_TAB)
+		expect(normalizeComboTab({ tab: 'news' })).toBe(DEFAULT_COMBO_TAB)
+		expect(normalizeComboTab(['news'])).toBe(DEFAULT_COMBO_TAB)
+		expect(normalizeComboTab(false)).toBe(DEFAULT_COMBO_TAB)
 	})
 })

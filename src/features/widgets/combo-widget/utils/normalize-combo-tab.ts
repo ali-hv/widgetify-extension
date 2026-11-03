@@ -1,7 +1,7 @@
 import { COMBO_TABS, DEFAULT_COMBO_TAB } from '../constants'
 import type { ComboTabType } from '../types'
 
-export function normalizeComboTab(stored?: string | null): ComboTabType {
+export function normalizeComboTab(stored?: unknown): ComboTabType {
 	if (!stored) return DEFAULT_COMBO_TAB
 
 	return COMBO_TABS.includes(stored as ComboTabType)

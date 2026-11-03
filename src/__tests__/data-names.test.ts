@@ -108,6 +108,8 @@ const ANALYTICS_EVENTS = [
 	'coin_package_purchase_unauthenticated',
 	'coin_package_purchased',
 	'combo_tab_changed',
+	'combo_tab_load_failed',
+	'combo_tab_save_failed',
 	'currency_compact_setting_change',
 	'currency_converter_swapped',
 	'currency_reorder',
