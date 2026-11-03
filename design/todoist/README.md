@@ -27,3 +27,9 @@ Today is the default and shows only tasks due today. Tomorrow shows only tasks d
 Google Calendar events form a separate section below tasks and open in Google Calendar. The integration reuses Widgetify's Google connection and requires its own Widgetify sign-in and Google authorization; the Todoist token cannot read native calendar events. Upcoming calendar events cover the next 30 days, while Upcoming tasks have no date limit. Signed-out and disconnected states offer the existing connection flow. Errors leave tasks visible.
 
 Visual checks: centered text on each selected tab at every widget size, long project names, empty Today/Tomorrow, midnight changes, all-day and overnight calendar events, signed-out Google connection, expired Google authorization, and glass/icy dropdowns.
+
+## Header and new-task placement
+
+The owner requested the new-task button directly below the project dropdown, and the update time in the shared header menu slot. [The revised reference](assets/header-actions.png) shows the resting state, with the time in the top-left corner. Hovering, keyboard focus or opening the menu swaps the time for the three-dot button through WidgetHeader.info, the same mechanism as currencies/news. `art/header-actions.py` draws this reference. The earlier task-view board remains alongside it.
+
+The new-task button stays above the task rows and hides while editing, as it did in its previous position. There is no footer timestamp. Check the header at the narrowest canvas, with the sync button visible, in light without wallpaper and glass/icy over a busy wallpaper.

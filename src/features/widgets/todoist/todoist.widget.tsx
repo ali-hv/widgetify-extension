@@ -156,6 +156,11 @@ export function TodoistWidget() {
 	return (
 		<>
 			<WidgetHeader
+				info={
+					snapshot?.lastSyncedAt
+						? formatUpdatedAt(snapshot.lastSyncedAt)
+						: undefined
+				}
 				title={
 					<>
 						<h3 className="flex-1 min-w-0 text-xs font-bold truncate text-fg-strong">
@@ -261,170 +266,161 @@ export function TodoistWidget() {
 							{t('todoist.tokenPrivacy')}
 						</p>
 					</form>
+				) : disconnecting ? (
+					<section
+						className="flex flex-col gap-2 p-2 text-xs text-fg"
+						aria-label={t('todoist.disconnectQuestion')}
+					>
+						<p>{t('todoist.disconnectQuestion')}</p>
+						<Button
+							color="danger"
+							variant="soft"
+							size="sm"
+							disabled={busy}
+							onClick={async () => {
+								if (await perform({ action: 'disconnect' })) {
+									setDisconnecting(false)
+									setEditor(null)
+									setToken('')
+								}
+							}}
+						>
+							{t('todoist.disconnect')}
+						</Button>
+						<Button
+							variant="ghost"
+							size="sm"
+							disabled={busy}
+							onClick={() => setDisconnecting(false)}
+						>
+							{t('todoist.no')}
+						</Button>
+					</section>
 				) : (
 					<>
-						{disconnecting ? (
-							<section
-								className="flex flex-col gap-2 p-2 text-xs text-fg"
-								aria-label={t('todoist.disconnectQuestion')}
+						<TabNavigation<TodoistTaskView>
+							tabMode="simple"
+							size="md"
+							className="w-full h-10 shrink-0"
+							activeBgClass="bg-brand-fill"
+							activeTextClass="text-brand"
+							activeTab={taskView}
+							onTabClick={(next) => {
+								setTaskView(next)
+								Analytics.event('todoist_view_selected', {
+									view: next,
+								})
+							}}
+							tabs={[
+								{ id: 'today', label: t('todoist.today') },
+								{ id: 'tomorrow', label: t('todoist.tomorrow') },
+								{ id: 'upcoming', label: t('todoist.upcoming') },
+							]}
+						/>
+						<SelectBox
+							label={t('todoist.projectFilter')}
+							value={project}
+							className="w-full min-w-0"
+							options={[
+								{ value: '', label: t('todoist.allProjects') },
+								...(snapshot?.projects ?? []).map((item) => ({
+									value: item.id,
+									label: item.name,
+								})),
+							]}
+							onChange={(value: string) => {
+								setProject(value)
+								Analytics.event('todoist_project_selected')
+							}}
+						/>
+						{!editor && (
+							<Button
+								variant="ghost"
+								color="brand"
+								size="sm"
+								className="justify-start"
+								disabled={busy}
+								icon={<Icon name="plus" size={14} />}
+								onClick={() => openEditor(null)}
 							>
-								<p>{t('todoist.disconnectQuestion')}</p>
-								<Button
-									color="danger"
-									variant="soft"
-									size="sm"
-									disabled={busy}
-									onClick={async () => {
-										if (await perform({ action: 'disconnect' })) {
-											setDisconnecting(false)
-											setEditor(null)
-											setToken('')
-										}
-									}}
-								>
-									{t('todoist.disconnect')}
-								</Button>
-								<Button
-									variant="ghost"
-									size="sm"
-									disabled={busy}
-									onClick={() => setDisconnecting(false)}
-								>
-									{t('todoist.no')}
-								</Button>
-							</section>
+								{t('todoist.add')}
+							</Button>
+						)}
+						{editor && snapshot ? (
+							<TodoistEditor
+								key={editor.key}
+								task={editor.task}
+								snapshot={snapshot}
+								initialProject={project}
+								initialDate={taskView === 'upcoming' ? '' : range.day}
+								busy={busy}
+								onCancel={() => setEditor(null)}
+								onSave={async (input) => {
+									if (
+										await perform({
+											action: 'save',
+											id: editor.task?.id,
+											input,
+											previousProject: editor.task?.project_id,
+											previousSection:
+												editor.task?.section_id ?? null,
+										})
+									)
+										setEditor(null)
+								}}
+								onDelete={async () => {
+									if (
+										editor.task &&
+										(await perform({
+											action: 'delete',
+											id: editor.task.id,
+										}))
+									)
+										setEditor(null)
+								}}
+							/>
 						) : (
 							<>
-								<TabNavigation<TodoistTaskView>
-									tabMode="simple"
-									size="md"
-									className="w-full h-10 shrink-0"
-									activeBgClass="bg-brand-fill"
-									activeTextClass="text-brand"
-									activeTab={taskView}
-									onTabClick={(next) => {
-										setTaskView(next)
-										Analytics.event('todoist_view_selected', {
-											view: next,
-										})
-									}}
-									tabs={[
-										{ id: 'today', label: t('todoist.today') },
-										{ id: 'tomorrow', label: t('todoist.tomorrow') },
-										{ id: 'upcoming', label: t('todoist.upcoming') },
-									]}
-								/>
-								<SelectBox
-									label={t('todoist.projectFilter')}
-									value={project}
-									className="w-full min-w-0"
-									options={[
-										{ value: '', label: t('todoist.allProjects') },
-										...(snapshot?.projects ?? []).map((item) => ({
-											value: item.id,
-											label: item.name,
-										})),
-									]}
-									onChange={(value: string) => {
-										setProject(value)
-										Analytics.event('todoist_project_selected')
-									}}
-								/>
-								{editor && snapshot ? (
-									<TodoistEditor
-										key={editor.key}
-										task={editor.task}
-										snapshot={snapshot}
-										initialProject={project}
-										initialDate={
-											taskView === 'upcoming' ? '' : range.day
-										}
-										busy={busy}
-										onCancel={() => setEditor(null)}
-										onSave={async (input) => {
-											if (
-												await perform({
-													action: 'save',
-													id: editor.task?.id,
-													input,
-													previousProject:
-														editor.task?.project_id,
-													previousSection:
-														editor.task?.section_id ?? null,
-												})
-											)
-												setEditor(null)
-										}}
-										onDelete={async () => {
-											if (
-												editor.task &&
-												(await perform({
-													action: 'delete',
-													id: editor.task.id,
-												}))
-											)
-												setEditor(null)
-										}}
-									/>
-								) : (
-									<>
-										{tasks.length === 0 &&
-											(error ? (
-												<WidgetError
-													message={errorMessage(error)}
-													onRetry={manualSync}
-												/>
-											) : (
-												<WidgetEmpty
-													art="tasks"
-													description={emptyMessage}
-												/>
-											))}
-										{snapshot && (
-											<TodoistTaskList
-												tasks={tasks}
-												snapshot={snapshot}
-												busy={busy}
-												onEdit={openEditor}
-												onComplete={(id) =>
-													void perform({
-														action: 'complete',
-														id,
-													})
-												}
-											/>
-										)}
-										<Button
-											variant="ghost"
-											color="brand"
-											size="sm"
-											className="justify-start"
-											disabled={busy}
-											icon={<Icon name="plus" size={14} />}
-											onClick={() => openEditor(null)}
-										>
-											{t('todoist.add')}
-										</Button>
-										<TodoistCalendar
-											view={taskView}
-											timezone={timezone}
-											range={range}
-											isAuthenticated={isAuthenticated}
-											connected={calendarConnected}
-											events={calendar.data}
-											loading={calendar.isFetching}
-											error={calendar.isError}
-											onRetry={retryCalendar}
+								{tasks.length === 0 &&
+									(error ? (
+										<WidgetError
+											message={errorMessage(error)}
+											onRetry={manualSync}
 										/>
-									</>
+									) : (
+										<WidgetEmpty
+											art="tasks"
+											description={emptyMessage}
+										/>
+									))}
+								{snapshot && (
+									<TodoistTaskList
+										tasks={tasks}
+										snapshot={snapshot}
+										busy={busy}
+										onEdit={openEditor}
+										onComplete={(id) =>
+											void perform({
+												action: 'complete',
+												id,
+											})
+										}
+									/>
 								)}
+
+								<TodoistCalendar
+									view={taskView}
+									timezone={timezone}
+									range={range}
+									isAuthenticated={isAuthenticated}
+									connected={calendarConnected}
+									events={calendar.data}
+									loading={calendar.isFetching}
+									error={calendar.isError}
+									onRetry={retryCalendar}
+								/>
 							</>
 						)}
-						{snapshot?.lastSyncedAt ? (
-							<p className="mt-auto pt-1 text-3xs text-fg-faint">
-								{formatUpdatedAt(snapshot.lastSyncedAt)}
-							</p>
-						) : null}
 					</>
 				)}
 			</div>
