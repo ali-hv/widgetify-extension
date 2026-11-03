@@ -368,3 +368,11 @@
 | `PUT /friends/activities/beta/{id}/reactions` | `{ reaction }` می‌فرستد | بدنه‌ای اعلام نکرده |
 | `PUT /users/@me/moods` | `sad`، `normal`، `happy` یا `excited` می‌فرستد | `tired` را هم دارد |
 | شکل پاسخ‌ها | همان شکل‌های بالا | بیشترشان اعلام نشده و چند مثال فرق دارند: `POST /bookmarks/import` بدون `data` نشان داده شده |
+
+## Todoist integration
+
+External endpoint: `POST https://api.todoist.com/api/v1/sync`, authenticated with the user's personal API token in an Authorization bearer header. This request bypasses the Widgetify API client.
+
+The form body supplies `sync_token` (initially `*`), `resource_types` (`items`, `projects`, `sections`, `labels`) and optional `commands`. Commands use UUIDs: `item_add` also uses a temporary id; `item_update`, `item_move`, `item_close` and `item_delete` operate on an existing task id. Task fields include content, description, due, priority and labels; project and section changes use `item_move`. `item_close` advances recurring tasks.
+
+The reply supplies `full_sync`, `sync_token`, resource arrays and per-command `sync_status`. Merge incremental arrays by id, removing deleted, archived and completed entries; replace the snapshot on a full sync. Persist a new cursor only with the corresponding snapshot. HTTP 401/403 asks for a replacement token, 429 respects Retry-After, and other failures keep the previous tasks visible. Credentials and task text are never analytics parameters.

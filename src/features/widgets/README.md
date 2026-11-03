@@ -106,3 +106,7 @@ A notification (the navbar card or the home dialog) can open the modal on one wi
 ## Tests
 
 Pure modules only: `__tests__/` covers the layout engine, push down, migration, size choice, zoned time and the drag's edge scrolling; each widget covers its own maths and `normalize-*` helpers.
+
+## Todoist
+
+`todoist/` is a separate task widget at 2x3, 3x3, 4x3 and 4x5 using a personal Todoist API token. It has its own local account cache, task editor and always-visible sync action. See [its guide](todoist/README.md).

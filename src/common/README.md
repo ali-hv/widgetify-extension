@@ -77,3 +77,5 @@ Importing moment-hijri also sets the global moment locale to `ar-sa`. Bun runs e
 ## Tests
 
 `src/common/__tests__/` covers the Firefox value sanitiser (`storage.test.ts`), error translation, colour helpers and the date conversions. Not tested, because they need the DOM or a browser: `play-alarm.ts`, `timeout.ts`, `call-event.ts`, `getCurrentDate`. `architecture.test.ts` holds the gateway rules ("touches browser storage only through common/storage", "reach framer-motion only through common/motion", "reach react-hot-toast only through common/toast and the toaster"). `data-names.test.ts` holds the names that are data.
+
+The shared local key `todoistAccount` holds the Todoist credential and sync snapshot for the background worker and task widget. Treat it as private account data; do not include it in analytics or a server request to Widgetify.

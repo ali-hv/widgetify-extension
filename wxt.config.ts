@@ -112,6 +112,7 @@ export default defineConfig({
 			},
 
 			host_permissions: [
+				'https://api.todoist.com/*',
 				'https://github.com/*',
 				'https://raw.githubusercontent.com/*',
 				'https://api.github.com/*',

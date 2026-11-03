@@ -16,6 +16,7 @@ import { releaseNotes } from './release-notes'
 import { setting } from './setting'
 import { ui } from './ui'
 import { widgets } from './widgets'
+import { todoist } from './todoist'
 
 export const fa = {
 	...auth,
@@ -36,4 +37,5 @@ export const fa = {
 	...setting,
 	...ui,
 	...widgets,
+	...todoist,
 } as const

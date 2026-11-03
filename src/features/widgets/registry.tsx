@@ -26,6 +26,7 @@ import { TodosLayout } from './todos/todos.widget'
 import { NotesLayout, resolveNotesVariant } from './notes/notes.widget'
 import { WidgetContainer } from './components/widget-container'
 import { WidgetTabKeys } from '@/features/widgets/types'
+import { TodoistWidget } from './todoist/todoist.widget'
 import { useSyncExternalStore } from 'react'
 import { PartnerWidget } from './partner-widget/partner-widget.widget'
 import { PartnerPreview } from './components/partner-preview'
@@ -403,6 +404,27 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		defaultSize: { w: 2, h: 3 },
 		canDuplicate: false,
 		node: (_instanceId, size) => <HabitsLayout size={size} />,
+	},
+	[WidgetKeys.todoist]: {
+		id: WidgetKeys.todoist,
+		label: 'todoist.title',
+		emoji: '',
+		icon: 'taskList',
+		category: 'productivity',
+		allowedSizes: [
+			{ w: 2, h: 3 },
+			{ w: 3, h: 3 },
+			{ w: 4, h: 3 },
+			{ w: 4, h: 5 },
+		],
+		defaultSize: { w: 2, h: 3 },
+		canToggle: true,
+		canDuplicate: false,
+		node: () => (
+			<WidgetContainer contentClassName="p-3 gap-2">
+				<TodoistWidget />
+			</WidgetContainer>
+		),
 	},
 	[WidgetKeys.todos]: {
 		id: WidgetKeys.todos,

@@ -57,3 +57,7 @@ export const habitKeys = {
 Hooks need React, so they are not tested. Anything pure that a hook uses (parsing, sorting, mapping) goes in a function and gets a test. A test must never import `api.ts`. The function sits flat in its domain folder (`todo/replace-todo-in-pages.ts`); its test goes in `src/__tests__/`, because this folder takes no `__tests__` of its own.
 
 `docs.test.ts` reads every request made in this folder and fails when `.github/Api-doc.md` or `.github/Api-doc.fa.md` does not list it, or lists one the app never calls.
+
+## Todoist
+
+`todoist/` uses the external Todoist API directly with a bearer token, outside the Widgetify client. The background worker serializes requests through `todoist-client.ts`; `use-todoist.hook.ts` reads a token-free view and watches local snapshot changes. Sync reads and task commands share one endpoint. Failed requests preserve the snapshot, and HTTP 429 sets a cooldown.

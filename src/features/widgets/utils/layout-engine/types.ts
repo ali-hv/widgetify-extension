@@ -5,6 +5,7 @@ export enum WidgetKeys {
 	calendar = 'calendar',
 	weather = 'weather',
 	todos = 'todos',
+	todoist = 'todoist',
 	tools = 'tools',
 	notes = 'notes',
 	network = 'network',

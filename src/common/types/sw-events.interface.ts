@@ -1,4 +1,7 @@
+import type { TodoistRequest } from '@/services/todoist/todoist.interface'
+
 export enum SwEventType {
+	TodoistRequest = 'TODOIST_REQUEST',
 	DeleteCache = 'DELETE_CACHE',
 	UpdateCache = 'UPDATE_CACHE',
 	SetActiveWallpaper = 'SET_ACTIVE_WALLPAPER',
@@ -39,4 +42,8 @@ type SetActiveWallpaperEvent = {
 	wallpaperType: 'IMAGE' | 'VIDEO'
 }
 
-export type SwEvent = DeleteCacheEvent | UpdateCacheEvent | SetActiveWallpaperEvent
+export type SwEvent =
+	| DeleteCacheEvent
+	| UpdateCacheEvent
+	| SetActiveWallpaperEvent
+	| { type: SwEventType.TodoistRequest; request: TodoistRequest }

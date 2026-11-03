@@ -1,3 +1,4 @@
+import type { TodoistAccount } from '@/services/todoist/todoist.interface'
 import type { Bookmark } from '@/services/bookmark/bookmark.interface'
 import type {
 	FetchedForecast,
@@ -10,6 +11,7 @@ import type { UserProfile } from '@/services/user/user-service.hook'
 import type { StoredWallpaper, Wallpaper } from '../types/wallpaper.interface'
 
 export interface StorageKV {
+	todoistAccount: TodoistAccount
 	currencies: string[]
 	currencyColorMode: 'normal' | 'reverse'
 	clockSync: { offset: number; syncedAt: number }

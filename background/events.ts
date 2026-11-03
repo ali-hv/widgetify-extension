@@ -1,3 +1,4 @@
+import { handleTodoistRequest } from '../src/services/todoist/todoist-client'
 import { cleanupOutdatedCaches } from 'workbox-precaching'
 import Analytics from '../src/analytics'
 import { removeFromStorage, setToStorage } from '../src/common/storage'
@@ -45,10 +46,13 @@ export function setupEventListeners() {
 
 	browser.runtime.onStartup.addListener(async () => {
 		Analytics.event('Startup')
+		await handleTodoistRequest({ action: 'sync' })
 	})
 
 	browser.runtime.onMessage.addListener(async (message: SwEvent) => {
 		switch (message.type) {
+			case SwEventType.TodoistRequest:
+				return handleTodoistRequest(message.request)
 			case SwEventType.DeleteCache: {
 				const cache = await caches.open(resolveCacheName(message.cacheName))
 				const requests = await cache.keys()

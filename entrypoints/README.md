@@ -92,3 +92,7 @@ Old cache names are listed in `LEGACY_CACHES` and deleted on start and on activa
 ## Tests
 
 `browser-baseline.test.ts` for the version rules. `background/__tests__/media-cache-budget.test.ts` for the catalog media eviction (age, entry cap, byte cap, oldest first). Nothing builds the extension in a test, so run `npm run build` yourself and grep `.output/chrome-mv3/assets/newtab-*.css` when a styling claim needs proof.
+
+### Todoist startup sync
+
+The startup listener calls the Todoist service queue to refresh a connected account even before the dashboard opens. New-tab mounts and manual sync use the same queue through a typed runtime message. `https://api.todoist.com/*` is a host permission for these authenticated requests. Todoist responses bypass Workbox and the HTTP cache.

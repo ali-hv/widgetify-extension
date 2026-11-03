@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import ts from 'typescript'
 
 const STORAGE_KEYS = [
+	'todoistAccount',
 	'activeWidgets',
 	'analyticsSession',
 	'appearance',
@@ -59,6 +60,22 @@ const STORAGE_KEYS = [
 ]
 
 const ANALYTICS_EVENTS = [
+	'todoist_token_help_opened',
+	'todoist_opened',
+	'todoist_synced',
+	'todoist_connected',
+	'todoist_disconnected',
+	'todoist_saved',
+	'todoist_completed',
+	'todoist_deleted',
+	'todoist_request_failed',
+	'todoist_sync_clicked',
+	'todoist_editor_opened',
+	'todoist_delete_opened',
+	'todoist_connection_opened',
+	'todoist_disconnect_opened',
+	'todoist_project_selected',
+
 	'IconClicked',
 	'Installed',
 	'Startup',
@@ -270,6 +287,7 @@ const ANALYTICS_EVENTS = [
 ]
 
 const WIDGET_IDS = [
+	'todoist',
 	'comboWidget',
 	'arzLive',
 	'news',
