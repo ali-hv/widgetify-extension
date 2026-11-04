@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
 import { getMainClient } from '@/services/api'
 import { wallpapersKeys } from '@/services/wallpapers/wallpapers.keys'
+import { useQuery } from '@tanstack/react-query'
 
-export const DEFAULT_VIP_MAX_UPLOAD_SIZE = 40
+export const DEFAULT_MAX_UPLOAD_SIZE = 40
 
 interface WallpaperConfig {
 	maxUploadSizeFree: number

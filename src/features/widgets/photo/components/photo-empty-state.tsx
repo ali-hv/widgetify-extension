@@ -1,19 +1,18 @@
-import type { ReactNode } from 'react'
 import { t } from '@/common/i18n'
 import { cn } from '@/common/utils/cn'
-import { Button, EmptyArt, VipBadge } from '@/components/ui'
-import { Icon, type IconName } from '@/icons'
+import { Button, EmptyArt } from '@/components/ui'
 import {
 	WidgetCenteredHeader,
 	WidgetHeader,
 } from '@/features/widgets/components/widget-header'
+import { Icon, type IconName } from '@/icons'
 import type { WidgetSize } from '../../utils/layout-engine/types'
 import { PHOTO_PLACEHOLDER_SRC } from '../constants'
 
 interface PhotoEmptyStateProps {
 	size: WidgetSize
 	hasFailed: boolean
-	isVip: boolean
+
 	onPickFromDevice: () => void
 	onOpenGallery: () => void
 }
@@ -21,7 +20,7 @@ interface PhotoEmptyStateProps {
 export function PhotoEmptyState({
 	size,
 	hasFailed,
-	isVip,
+
 	onPickFromDevice,
 	onOpenGallery,
 }: PhotoEmptyStateProps) {
@@ -46,7 +45,6 @@ export function PhotoEmptyState({
 						icon="uploadImage"
 						label={t('widgets.photo.fromDeviceShort')}
 						isStacked={isSquare}
-						badge={!isSquare && !isVip && <VipBadge size="xs" iconOnly />}
 						onClick={onPickFromDevice}
 					/>
 					<PhotoSourceButton
@@ -108,7 +106,6 @@ export function PhotoEmptyState({
 						icon={<Icon name="uploadImage" size={12} />}
 					>
 						{t('widgets.photo.fromDeviceShort')}
-						{!isVip && <VipBadge size="xs" text={t('ui.vip.pro')} />}
 					</Button>
 				</div>
 			</div>
@@ -120,7 +117,7 @@ interface PhotoSourceButtonProps {
 	icon: IconName
 	label: string
 	isStacked: boolean
-	badge?: ReactNode
+
 	onClick: () => void
 }
 
@@ -128,7 +125,7 @@ function PhotoSourceButton({
 	icon,
 	label,
 	isStacked,
-	badge,
+
 	onClick,
 }: PhotoSourceButtonProps) {
 	return (
@@ -142,7 +139,6 @@ function PhotoSourceButton({
 		>
 			<Icon name={icon} size={isStacked ? 16 : 14} aria-hidden="true" />
 			<span className="max-w-full truncate">{label}</span>
-			{badge}
 		</button>
 	)
 }

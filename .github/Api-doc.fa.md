@@ -29,7 +29,7 @@
 
 **ورود.** `POST /auth/signin`، `POST /auth/oauth/google` و `POST /auth/otp/verify` توکن دسترسی را داخل `data` برمی‌گردانند. توکن refresh توی هدر پاسخ به اسم `refresh_token` می‌آید. افزونه این دو را با کلیدهای storage به اسم `auth_token` و `refresh_token` نگه می‌دارد.
 
-**تمدید توکن.** روی خطای `401` کلاینت `POST /auth/refresh` را با `{ refresh_token }` صدا می‌زند، توکن جدید را از `data` برمی‌دارد و درخواست را یک بار تکرار می‌کند. اگر نشد، کاربر را خارج می‌کند. مسیرهای ورود این مرحله را رد می‌کنند.
+**تمدید توکن.** روی خطای `401` درخواستی که هدر `Authorization` داشته، کلاینت `POST /auth/refresh` را با `{ refresh_token }` صدا می‌زند، توکن جدید را از `data` برمی‌دارد و درخواست را یک بار تکرار می‌کند. اگر نشد، کاربر را خارج می‌کند. مسیرهای ورود و درخواست‌های بدون توکن این مرحله را رد می‌کنند؛ خطای درخواست عمومی باعث خروج کاربر یا پاک شدن تنظیمات محلی نمی‌شود.
 
 **خطاها.** درخواست ناموفق `{ statusCode, success: false, message }` جواب می‌دهد. `message` کدی مثل `NOT_FOUND` است و افزونه با `translateError` در `src/common/utils/translate-error.ts` آن را به متن فارسی تبدیل می‌کند. درخواستی که فیلد نامعتبر دارد ممکن است `formValidation: [{ property, message }]` هم داشته باشد.
 
@@ -107,7 +107,6 @@
 | `POST /google/connect` | بله | | `{ url }`. بازش کنید تا کاربر گوگل را وصل کند. `google` تنها پلتفرم است |
 | `POST /google/disconnect` | بله | | |
 | `GET /google/events` | بله | `start`، `end`: تاریخ، با URL encode | `{ events: [] }`، رویدادهای Google Calendar. `GoogleCalendarEvent` را در `src/services/date/get-google-calendar-events.hook.ts` ببینید |
-| `GET /users/@me/rewards` | بله | `page`، `limit` | `{ code, tasks, referrals, totalPages, totalCount }`. هر task این است: `{ task, reward_coin, isDone, icon, button? }` و هر referral این: `{ name, avatar, username }` |
 | `GET /users/@me/rewards/code` | بله | | `{ referralCode }` |
 
 ## دوستان و فعالیت‌ها
@@ -311,14 +310,8 @@
 |---|---|---|---|
 | `GET /market` | بله | `page`، `limit`، `type` | `{ items, totalPages, total? }` |
 | `GET /market/@me/inventory` | بله | `page`، `limit`، `type` | `{ fonts, browser_titles, themes, pets?, pet_backgrounds?, pagination: { totalPages, total } }` |
-| `POST /market/purchase` | بله | `{ itemId* }` | `{ success, message, remainingCoins }` |
-| `GET /market/packages/coins` | بله | `page`، `limit` | `{ data: { packages, totalPages, currentPage, totalCount } }`. هر پکیج `{ id, price, title, description, coin }` است |
-| `POST /market/packages/coins/purchase` | بله | `{ packageId* }` | `{ data: { url } }`. افزونه کاربر را برای پرداخت به `url` می‌برد |
-| `GET /market/packages/vip` | بله | | `{ data: { packages } }`. هر پلن `{ id, title, price, days, isActive, isClaimed?, order?, meta?, createdAt?, updatedAt? }` است |
-| `POST /market/packages/vip/purchase` | بله | `{ packageId* }` | `{ data: { url?, isFree?, activated?, days? } }`. افزونه همین فیلدها را بدون `data` هم می‌پذیرد. اگر `url` باشد کاربر را برای پرداخت به آن می‌برد |
 | `GET /gallery` | خیر | `page`، `limit`، `type`، `category`. `type` یکی از `PHOTO_FRAME`، `BOOKMARK_ICON` یا `AVATAR` است | `{ data: { assets, pagination: { page, limit, total, totalPages } } }` |
 | `GET /gallery/categories` | خیر | `type` | `{ data: { categories: string[] } }` |
-| `POST /gallery/{id}/purchase` | بله | | `{ data: { success, asset } }` |
 | `GET /mini-apps/beta/list` | بله | `page`، `limit` | `{ data: { miniApps, totalPages, totals } }` |
 | `GET /mini-apps/beta/app-id/{appId}` | بله | | `{ data: MiniApp }` که `isLaunchedByUser` هم دارد |
 | `POST /mini-apps/beta/launch` | بله | `{ appId* }` | `{ data: { launchUrl, origin, data, signature } }` |
@@ -356,7 +349,6 @@
 | `GET /news/rss` | `url` و `sourceName` را می‌فرستد | هیچ query ای اعلام نکرده |
 | `GET /todos/v2/@me` | `dateFilter` و `category` را هم می‌فرستد | فقط `page`، `limit` و `isCompleted` را اعلام کرده |
 | `GET /pomodoro/tops` | `type` را می‌فرستد | هیچ query ای اعلام نکرده |
-| `GET /market/packages/coins` | `page` و `limit` را می‌فرستد | هیچ query ای اعلام نکرده |
 | `GET /date/owghat` | `lat` و `lan` را می‌فرستد | `lat` و `long` را اعلام کرده. اگر Swagger درست باشد طول جغرافیایی هیچ‌وقت به سرور نمی‌رسد |
 | `GET /weather/current` | فقط `addForecast` را می‌فرستد | `useAI` و `addForecast` را اجباری کرده و `lat`، `lon` و `count` را هم دارد |
 | `GET /users/@me/moods/stats` | query نمی‌فرستد | `year` و `month` را اعلام کرده |

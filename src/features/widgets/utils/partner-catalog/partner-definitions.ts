@@ -21,7 +21,6 @@ function variantOption(
 		label: 'widgets.registry.partner.label',
 		title: variant.title,
 		size: variant.size,
-		isVipOnly: variant.isVipOnly,
 		meta: { ...variant.meta, variant: variant.id },
 	}
 }
@@ -39,7 +38,6 @@ export function partnerDefinition(
 		iconUrl: item.iconUrl,
 		description: item.description,
 		category: item.category,
-		isVipOnly: item.isVipOnly,
 		isBeta: item.isNew,
 		allowedSizes: item.allowedSizes,
 		defaultSize: item.defaultSize,

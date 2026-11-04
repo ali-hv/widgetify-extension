@@ -34,7 +34,6 @@ export interface WidgetPosition {
 export interface WidgetSize {
 	w: number
 	h: number
-	isVipOnly?: boolean
 }
 
 export interface StoredWidget {
@@ -80,7 +79,6 @@ export interface WidgetVariantOption {
 	label: MessageKey
 	title?: string
 	size: WidgetSize
-	isVipOnly?: boolean
 	meta?: Record<string, any>
 }
 
@@ -94,7 +92,6 @@ export interface WidgetDefinition {
 	iconUrl?: string | null
 	description?: string | null
 	category?: WidgetCategory
-	isVipOnly?: boolean
 	allowedSizes: WidgetSize[]
 	defaultSize: WidgetSize
 	canResize?: boolean

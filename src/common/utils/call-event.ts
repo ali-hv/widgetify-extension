@@ -1,16 +1,13 @@
-import type { Bookmark } from '@/services/bookmark/bookmark.interface'
-import type { StoredWallpaper, Wallpaper } from '../types/wallpaper.interface'
-import type { Todo } from '@/services/todo/todo.interface'
 import type { Page } from '@/context/page.context'
+import type { Bookmark } from '@/services/bookmark/bookmark.interface'
+import type { Todo } from '@/services/todo/todo.interface'
+import type { StoredWallpaper, Wallpaper } from '../types/wallpaper.interface'
 
 export interface EventName {
 	openSettings:
 		| 'account'
 		| 'profile'
 		| 'platforms'
-		| 'vip'
-		| 'pro'
-		| 'tasks'
 		| 'friends'
 		| 'general'
 		| 'access'
@@ -40,7 +37,7 @@ export interface EventName {
 		currencies: string[]
 	}
 	closeAllDropdowns: null
-	openProfile?: 'friends' | 'platforms' | 'vip' | 'pro'
+	openProfile?: 'friends' | 'platforms'
 	openMarketModal?: {
 		tab?: string
 		filter?: string
@@ -62,7 +59,7 @@ export interface EventName {
 	openFriendLook: { username: string; name: string }
 	resetWallpaper: null
 	openAddCustomWidgetModal:
-		| { instanceId?: string; widgetId?: string; returnToSettings?: boolean }
+		| { instanceId?: string; widgetId?: string }
 		| null
 		| undefined
 	openWidgetCatalog: string

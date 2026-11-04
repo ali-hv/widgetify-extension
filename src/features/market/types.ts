@@ -8,22 +8,13 @@ export type StoreItemType =
 	| 'PET_BACKGROUND'
 	| 'WALLPAPER'
 
-export type ItemState = 'active' | 'owned' | 'free' | 'locked'
+export type ItemState = 'active' | 'free'
 
-export type StoreView =
-	| 'home'
-	| 'WALLPAPER'
-	| 'THEME'
-	| 'FONT'
-	| 'PET'
-	| 'BROWSER_TITLE'
-	| 'wallet'
+export type StoreView = 'home' | 'WALLPAPER' | 'THEME' | 'FONT' | 'PET' | 'BROWSER_TITLE'
 
 export type CategoryType = 'THEME' | 'FONT' | 'BROWSER_TITLE' | 'PET'
 
 export type AppearanceItemType = 'THEME' | 'FONT' | 'BROWSER_TITLE'
-
-export type WallpaperAccess = 'all' | 'free' | 'coin' | 'mine'
 
 export type WallpaperKind = 'all' | 'image' | 'animated'
 

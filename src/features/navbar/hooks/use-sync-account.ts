@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { t } from '@/common/i18n'
 import { getMultipleFromStorage, setToStorage } from '@/common/storage'
-import { callEvent } from '@/common/utils/call-event'
 import type { StoredWallpaper, Wallpaper } from '@/common/types/wallpaper.interface'
+import { callEvent } from '@/common/utils/call-event'
 import { useAuth } from '@/context/auth.context'
 import { getAccountSync } from '@/services/extension/get-account-sync'
 import type { UserInventoryItem } from '@/services/market/market.interface'
-import { t } from '@/common/i18n'
+import { useEffect, useRef } from 'react'
 
 export function useSyncAccount() {
 	const { isAuthenticated } = useAuth()
@@ -49,7 +49,7 @@ async function processWallpaper(
 	wallpaperStore: StoredWallpaper | undefined
 ) {
 	try {
-		if (!wallpaper) return
+		if (!wallpaper || wallpaperStore?.localOnly === true) return
 
 		if (wallpaper.id === 'custom-wallpaper' || wallpaper.isCustom) {
 			const isSame =

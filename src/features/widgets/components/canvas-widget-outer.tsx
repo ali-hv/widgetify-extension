@@ -1,3 +1,7 @@
+import { t } from '@/common/i18n'
+import { callEvent, listenEvent } from '@/common/utils/call-event'
+import { cn } from '@/common/utils/cn'
+import { useFreeWidgetActions } from '@/features/widgets/widgets.context'
 import type React from 'react'
 import {
 	memo,
@@ -8,11 +12,9 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { callEvent, listenEvent } from '@/common/utils/call-event'
-import { useFreeWidgetActions } from '@/features/widgets/widgets.context'
-import { getWidgetPixelRect } from '../utils/grid-geometry'
-import { useKeyboardFocusWithin } from '../hooks/use-keyboard-focus-within'
 import { useDragAutoScroll } from '../hooks/use-drag-auto-scroll'
+import { useKeyboardFocusWithin } from '../hooks/use-keyboard-focus-within'
+import { getWidgetPixelRect } from '../utils/grid-geometry'
 import { rowCapFor } from '../utils/layout-engine/row-cap'
 import {
 	type StoredWidget,
@@ -21,17 +23,11 @@ import {
 	type WidgetPosition,
 	type WidgetSize,
 } from '../utils/layout-engine/types'
-import { cn } from '@/common/utils/cn'
-import { useAuth } from '@/context/auth.context'
-import { VipBadge } from '@/components/ui'
-import { useWidgetVipResolver } from '@/features/widgets/hooks/use-widget-vip-resolver'
-import { WidgetMenuProvider } from '../widget-menu.context'
-import { type WidgetMenuAnchor, WidgetContextMenu } from './widget-context-menu'
-import { BookmarkDeleteModal } from './bookmark-delete-modal'
-import { WidgetMenuButton } from './widget-menu-button'
-import { WidgetSlot } from './widget-slot'
-import { t } from '@/common/i18n'
 import { widgetTitle } from '../utils/partner-catalog/partner-definitions'
+import { WidgetMenuProvider } from '../widget-menu.context'
+import { BookmarkDeleteModal } from './bookmark-delete-modal'
+import { WidgetContextMenu, type WidgetMenuAnchor } from './widget-context-menu'
+import { WidgetSlot } from './widget-slot'
 
 interface CanvasWidgetOuterProps {
 	widget: StoredWidget
@@ -62,9 +58,8 @@ function CanvasWidgetOuterImpl({
 	isSelected,
 	wiggleVariant,
 }: CanvasWidgetOuterProps) {
-	const { isVip } = useAuth()
 	const keyboardFocus = useKeyboardFocusWithin()
-	const { isWidgetVipOnly, isVariantVipOnly, isSizeVipOnly } = useWidgetVipResolver()
+
 	const {
 		setCanvasMode,
 		setSelectedInstanceId,
@@ -75,14 +70,6 @@ function CanvasWidgetOuterImpl({
 		duplicateWidget,
 		removeWidget,
 	} = useFreeWidgetActions()
-
-	const isCurrentWidgetVipOnly = isWidgetVipOnly(widget.id)
-	const isCurrentVariantVipOnly = isVariantVipOnly(widget.id, widget.meta?.variant)
-	const isCurrentSizeVipOnly = isSizeVipOnly(widget.id, widget.size)
-	const isLocked =
-		!isVip &&
-		(isCurrentWidgetVipOnly || isCurrentVariantVipOnly || isCurrentSizeVipOnly)
-	const isCompactSize = widget.size.w === 1 && widget.size.h === 1
 
 	const [isDragging, setIsDragging] = useState(false)
 	const [menuAnchor, setMenuAnchor] = useState<WidgetMenuAnchor | null>(null)
@@ -428,41 +415,13 @@ function CanvasWidgetOuterImpl({
 							isWiggling && WIGGLE_CLASSES[wiggleVariant]
 						)}
 					>
-						{(!isLocked || canvasMode === 'edit') && (
-							<WidgetSlot
-								definition={definition}
-								instanceId={widget.instanceId}
-								size={widget.size}
-								meta={widget.meta}
-							/>
-						)}
-						{isLocked && canvasMode === 'normal' && (
-							<button
-								type="button"
-								aria-label={t('widgets.canvas.upgradeProAria')}
-								className="absolute inset-0 z-25 rounded-widget bg-glass-surface-2 border border-vip-fill-2 flex flex-col items-center justify-center p-2 text-center select-none cursor-pointer overflow-hidden group transition-ui duration-200 hover:border-vip"
-								onClick={(e) => {
-									e.stopPropagation()
-									callEvent('openSettings', 'vip')
-								}}
-							>
-								<div className="flex flex-col items-center gap-1.5 transition-transform duration-200 group-hover:scale-105">
-									<VipBadge
-										size={isCompactSize ? 'xs' : 'sm'}
-										variant="solid"
-										text={t('ui.vip.pro')}
-									/>
-									{!isCompactSize && (
-										<span className="text-2xs font-medium text-fg-muted transition-colors duration-200 group-hover:text-fg">
-											{t('widgets.canvas.upgradePro')}
-										</span>
-									)}
-								</div>
-							</button>
-						)}
-						{isLocked && canvasMode === 'normal' && (
-							<WidgetMenuButton placement="floating" />
-						)}
+						<WidgetSlot
+							definition={definition}
+							instanceId={widget.instanceId}
+							size={widget.size}
+							meta={widget.meta}
+						/>
+
 						{canvasMode === 'edit' && (
 							<div className="absolute inset-0 z-30 bg-transparent pointer-events-auto cursor-grab" />
 						)}

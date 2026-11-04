@@ -1,10 +1,8 @@
-import { useRef, useState } from 'react'
 import Analytics from '@/analytics'
-import {
-	type Friend,
-	useGetFriends,
-	useRemoveFriend,
-} from '@/services/friends/friend-service.hook'
+import { t } from '@/common/i18n'
+import { showToast } from '@/common/toast'
+import { cn } from '@/common/utils/cn'
+import { translateError } from '@/common/utils/translate-error'
 import {
 	AvatarComponent,
 	Button,
@@ -14,23 +12,25 @@ import {
 	PopoverMenuItem,
 	Spinner,
 } from '@/components/ui'
+import { useAuth } from '@/context/auth.context'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 import { Icon } from '@/icons'
-import { t } from '@/common/i18n'
-import { cn } from '@/common/utils/cn'
-import { translateError } from '@/common/utils/translate-error'
-import { showToast } from '@/common/toast'
-import { useAuth } from '@/context/auth.context'
+import {
+	type Friend,
+	useGetFriends,
+	useRemoveFriend,
+} from '@/services/friends/friend-service.hook'
+import { useRef, useState } from 'react'
 import { ActiveFriendsHorizontal } from './activities'
 import { AddFriendBottomSheet } from './add-friend-bottom-sheet'
-import { FriendRequestsButton } from './friend-requests-button'
 import { BirthdayBadge, CongratulateButton } from './congratulate-button'
-import { MoodBadge } from './mood-badge'
+import { FriendRequestsButton } from './friend-requests-button'
 import {
 	FriendSuggestionsBubble,
 	FriendSuggestionsView,
 	useFriendSuggestionList,
 } from './friend-suggestions'
+import { MoodBadge } from './mood-badge'
 import { ProfileCardTrigger } from './profile-card/profile-card-trigger'
 
 export function FriendsDirectView() {
@@ -248,7 +248,6 @@ function FriendRow({ friend, onRemove }: { friend: Friend; onRemove: () => void 
 						url={user.avatar}
 						placeholder={user.name}
 						size="md"
-						isPro={Boolean(user.isPro)}
 					/>
 					{user.mood && <MoodBadge mood={user.mood} size="sm" />}
 					{user.isBirthdayToday && <BirthdayBadge />}

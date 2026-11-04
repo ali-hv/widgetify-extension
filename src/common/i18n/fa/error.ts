@@ -1,4 +1,6 @@
 export const error = {
+	'error.featureUnavailable':
+		'فعلا سرور اجازه‌ی استفاده از این قابلیت رو نمیده، دوباره امتحان کن',
 	'error.activityAlreadyExists': 'فعلا فقط یه نوشته میتونی داشته باشی',
 	'error.maxSharedUsersExceeded':
 		'این تسک رو با بیشتر از این تعداد نمیشه به اشتراک گذاشت',
@@ -71,7 +73,6 @@ export const error = {
 	'error.firstVerifyYourAccount': 'اول حسابت رو تایید کن',
 	'error.usernameAlreadyExists': 'این نام کاربری رو قبلا یکی برداشته',
 	'error.invalidFileType': 'این نوع فایل پشتیبانی نمیشه',
-	'error.notEnoughCoins': 'ویج‌کوین‌هات کافی نیست',
 	'error.invalidReferralCode': 'این کد دعوت درست نیست',
 	'error.itemAlreadyExists': 'این رو قبلا گرفتی و مال توئه، لازم نیست دوباره بخریش',
 	'error.invalidId': 'یه چیزی درست نیست، دوباره امتحان کن',
@@ -94,10 +95,6 @@ export const error = {
 	'error.cannotChangeEmail': 'نمیتونی ایمیل رو تغییر بدی',
 	'error.sameEmailError': 'این همون ایمیل فعلیته',
 	'error.firstSetEmail': 'هنوز ایمیل ثبت نکردی',
-	'error.packageNotFound': 'این بسته رو پیدا نکردیم',
-	'error.paymentFailed': 'پرداخت انجام نشد، دوباره امتحان کن',
-	'error.paymentAlreadyProcessed': 'این پرداخت قبلا انجام شده',
-	'error.paymentNotFound': 'این پرداخت رو پیدا نکردیم',
 	'error.tryNextTime': 'یه مشکلی پیش اومد، یه کم بعد دوباره امتحان کن',
 	'error.tooManyAttemptsHabit': 'بیشتر از این نمیتونی بسازی',
 	'error.folderStructureTooDeep': 'پوشه‌ها زیادی تو در تو شدن',
@@ -105,7 +102,6 @@ export const error = {
 	'error.noValidItemsToImport': 'چیزی برای درون‌ریزی پیدا نکردیم',
 	'error.birthdateCannotBeChanged':
 		'تازه تاریخ تولدت رو عوض کردی، فعلا نمیشه دوباره عوضش کرد',
-	'error.vipRequired': 'این قابلیت مال نسخه‌ی پروئه',
 	'error.uploadInProgress': 'داریم فایل رو آپلود میکنیم، یه کم صبر کن',
 	'error.customWallpaperRemoved': 'تصویر پس‌زمینه حذف شد',
 	'error.uploadFailed': 'نتونستیم فایل رو آپلود کنیم، دوباره امتحان کن',

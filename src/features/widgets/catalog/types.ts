@@ -8,7 +8,7 @@ export interface AddWidgetModalProps {
 		widgetId: string
 	} | null
 	onClose: () => void
-	returnsToSettings?: boolean
+
 	focusWidgetId?: string | null
 }
 

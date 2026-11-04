@@ -1,26 +1,25 @@
-import { useCallback } from 'react'
-import type React from 'react'
 import Analytics from '@/analytics'
 import { t } from '@/common/i18n'
 import { playNativeToastSound, showToast } from '@/common/toast'
 import { translateError } from '@/common/utils/translate-error'
-import { callEvent } from '@/common/utils/call-event'
+import { getWidgetRegistry } from '@/features/widgets/registry'
+import { isServerInstanceId } from '@/features/widgets/utils/instance-id'
 import { DEFAULT_COLS } from '@/features/widgets/utils/layout-engine/constants'
 import { resolveLayoutChange } from '@/features/widgets/utils/layout-engine/layout-engine'
-import { validateLayout } from '@/features/widgets/utils/layout-engine/validation'
 import {
 	type StoredWidget,
 	WidgetKeys,
 	type WidgetPosition,
 	type WidgetSize,
 } from '@/features/widgets/utils/layout-engine/types'
-import { isServerInstanceId } from '@/features/widgets/utils/instance-id'
-import { getWidgetRegistry } from '@/features/widgets/registry'
+import { validateLayout } from '@/features/widgets/utils/layout-engine/validation'
 import {
 	createUserWidgetApi,
 	deleteUserWidgetApi,
 	updateUserWidgetApi,
 } from '@/services/widgets/widget-sync.hook'
+import type React from 'react'
+import { useCallback } from 'react'
 import { reflowForColumns, sanitizeLayout } from '../utils/widget-layout-helpers'
 import { createNoteForDuplicatedWidget } from '../utils/widget-note-helpers'
 import { withWidgetMeta } from '../utils/with-widget-meta'
@@ -33,7 +32,6 @@ interface UseWidgetOperationsParams {
 	runtimeLayoutRef: React.MutableRefObject<StoredWidget[]>
 	savedLayoutRef: React.MutableRefObject<StoredWidget[]>
 	colsRef: React.MutableRefObject<number>
-	isVipRef: React.MutableRefObject<boolean>
 	selectedInstanceIdRef: React.MutableRefObject<string | null>
 	isAuthenticated: boolean
 	isEditingRef: React.MutableRefObject<boolean>
@@ -51,7 +49,6 @@ export function useWidgetOperations({
 	runtimeLayoutRef,
 	savedLayoutRef,
 	colsRef,
-	isVipRef,
 	selectedInstanceIdRef,
 	isAuthenticated,
 	isEditingRef,
@@ -238,13 +235,6 @@ export function useWidgetOperations({
 			}
 
 			const chosenSize = initialSize || def.defaultSize
-			const isCurrentlyActive = runtimeLayoutRef.current.some(
-				(w) => w.id === def.id
-			)
-			if (isCurrentlyActive && !isVipRef.current) {
-				callEvent('openSettings', 'vip')
-				return false
-			}
 
 			let finalInstanceId = `${id}-${Date.now().toString(36)}`
 
@@ -292,7 +282,7 @@ export function useWidgetOperations({
 			playNativeToastSound('success')
 			return commitMutation('add', result, finalInstanceId)
 		},
-		[runtimeLayoutRef, colsRef, isVipRef, isAuthenticated, commitMutation]
+		[runtimeLayoutRef, colsRef, isAuthenticated, commitMutation]
 	)
 
 	const duplicateWidget = useCallback(
@@ -305,11 +295,6 @@ export function useWidgetOperations({
 			const def = getWidgetRegistry()[original.id]
 			if (!def?.canDuplicate) {
 				showToast(t('widgets.ops.cannotDuplicate'), 'error')
-				return false
-			}
-
-			if (!isVipRef.current) {
-				callEvent('openSettings', 'vip')
 				return false
 			}
 
@@ -373,7 +358,7 @@ export function useWidgetOperations({
 			playNativeToastSound('success')
 			return commitMutation('duplicate', result, newInstanceId)
 		},
-		[runtimeLayoutRef, colsRef, isVipRef, isAuthenticated, commitMutation]
+		[runtimeLayoutRef, colsRef, isAuthenticated, commitMutation]
 	)
 
 	const removeWidget = useCallback(

@@ -20,7 +20,6 @@ function preset(
 		id: 'p',
 		titleKey: 'widgets.presets.default.title',
 		descriptionKey: 'widgets.presets.default.description',
-		isVip: false,
 		isFeatured: false,
 		category: 'minimal',
 		verticalAlign,

@@ -12,16 +12,15 @@ function serverItem(overrides: Record<string, unknown> = {}) {
 		icon: 'https://cdn.example.test/partner-widgets/pomodoro.png',
 		description: 'یک تایمر ساده برای تمرکز',
 		category: 'productivity',
-		isVipOnly: false,
 		isNew: true,
 		allowedSizes: [
 			{ w: 2, h: 1 },
-			{ w: 4, h: 2, isVipOnly: true },
+			{ w: 4, h: 2 },
 		],
 		defaultSize: { w: 2, h: 1 },
 		variants: [
 			{ id: 'compact', label: 'فشرده', size: { w: 2, h: 1 } },
-			{ id: 'wide', label: 'کامل', size: { w: 4, h: 2 }, isVipOnly: true },
+			{ id: 'wide', label: 'کامل', size: { w: 4, h: 2 } },
 		],
 		canDuplicate: false,
 		kind: 'partner',
@@ -123,6 +122,22 @@ describe('normalizePartnerCatalog icon', () => {
 })
 
 describe('normalizePartnerCatalog', () => {
+	it('ignores legacy subscription flags on widgets, sizes and variants', () => {
+		const [item] = normalizePartnerCatalog([
+			serverItem({
+				isVipOnly: true,
+				allowedSizes: [{ w: 4, h: 2, isVipOnly: true }],
+				defaultSize: { w: 4, h: 2 },
+				variants: [
+					{ id: 'wide', label: 'wide', size: { w: 4, h: 2 }, isVipOnly: true },
+				],
+			}),
+		])
+		expect(item).not.toHaveProperty('isVipOnly')
+		expect(item.allowedSizes).toEqual([{ w: 4, h: 2 }])
+		expect(item.variants[0]).not.toHaveProperty('isVipOnly')
+	})
+
 	it('reads a complete server item', () => {
 		const [item] = normalizePartnerCatalog([serverItem()])
 
@@ -134,16 +149,15 @@ describe('normalizePartnerCatalog', () => {
 			iconUrl: 'https://cdn.example.test/partner-widgets/pomodoro.png',
 			description: 'یک تایمر ساده برای تمرکز',
 			category: 'productivity',
-			isVipOnly: false,
 			isNew: true,
 			allowedSizes: [
 				{ w: 2, h: 1 },
-				{ w: 4, h: 2, isVipOnly: true },
+				{ w: 4, h: 2 },
 			],
 			defaultSize: { w: 2, h: 1 },
 			variants: [
 				{ id: 'compact', title: 'فشرده', size: { w: 2, h: 1 } },
-				{ id: 'wide', title: 'کامل', size: { w: 4, h: 2 }, isVipOnly: true },
+				{ id: 'wide', title: 'کامل', size: { w: 4, h: 2 } },
 			],
 			canDuplicate: false,
 			widgetUrl: 'https://iframes.example.test/w/pomodoro',
@@ -233,7 +247,6 @@ describe('normalizePartnerCatalog', () => {
 		expect(item.category).toBe('info')
 		expect(item.defaultSize).toEqual({ w: 2, h: 1 })
 		expect(item.variants).toEqual([])
-		expect(item.isVipOnly).toBe(false)
 		expect(item.canDuplicate).toBe(false)
 	})
 

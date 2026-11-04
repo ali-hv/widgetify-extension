@@ -1,10 +1,9 @@
-import { callEvent } from '@/common/utils/call-event'
-import type { MiniApp } from '@/services/mini-apps/mini-apps.interface'
-import { Icon } from '@/icons'
-import { Button, PopoverMenu, PopoverMenuItem, Tooltip, VipBadge } from '@/components/ui'
-import { useAuth } from '@/context/auth.context'
 import Analytics from '@/analytics'
 import { t } from '@/common/i18n'
+import { callEvent } from '@/common/utils/call-event'
+import { Button, PopoverMenu, PopoverMenuItem, Tooltip } from '@/components/ui'
+import { Icon } from '@/icons'
+import type { MiniApp } from '@/services/mini-apps/mini-apps.interface'
 
 interface Prop {
 	onClickToBack: () => void
@@ -27,7 +26,6 @@ export function MiniAppRunnerHeader({
 	const [isFullScreen, setIsFullScreen] = useState(false)
 	const [menuOpen, setMenuOpen] = useState(false)
 	const menuAnchorRef = useRef<HTMLButtonElement>(null)
-	const { isVip } = useAuth()
 
 	const onToggleFullScreen = () => {
 		const newState = !isFullScreen
@@ -146,19 +144,10 @@ export function MiniAppRunnerHeader({
 							<PopoverMenuItem
 								icon={<Icon name="pictureInPicture" size={14} />}
 								label={t('miniApps.header.openWindow')}
-								badge={
-									isVip ? undefined : (
-										<VipBadge size="xs" text={t('ui.vip.pro')} />
-									)
-								}
-								disabled={isVip && (isLoading || isConnecting)}
+								disabled={isLoading || isConnecting}
 								onClick={() => {
 									setMenuOpen(false)
-									if (isVip) onOpenInWindow()
-									else {
-										Analytics.event('mini_app_pro_gate_blocked')
-										callEvent('openSettings', 'vip')
-									}
+									onOpenInWindow()
 								}}
 							/>
 						)}

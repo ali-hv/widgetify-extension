@@ -20,7 +20,7 @@ The old chart jumped between two levels like a square wave. The history from pri
 - The chart line follows a rolling average of the history, so a price that flips back and forth draws as one calm line. The tooltip still shows the real price at each point.
 - The price axis never spans less than 8% of the price, so a small move stays small.
 - The line is a smooth curve with a light fill and no gridlines. High, low and the range's change are no longer shown above the chart.
-- The range control moved into the header, with short labels (روز، هفته، ماه). It shows only for pro users.
+- The range control moved into the header, with short labels (روز، هفته، ماه). It now shows for everyone, following the removal of subscriptions.
 - The converter is always visible in the footer, with a swap button, instead of hidden behind an icon. It is still hidden for services.
 - The board drew an update time next to the code («۲ دقیقه پیش»). The owner dropped it after seeing «همین الان» there every time the modal opened.
 - The modal has no close button; the backdrop and Escape close it.

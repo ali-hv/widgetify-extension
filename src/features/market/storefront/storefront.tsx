@@ -53,7 +53,7 @@ export function Storefront({ selectedId, onOpen, onNavigate }: StorefrontProps) 
 		)
 	}
 
-	const featured = items.find((item) => stateOf(item) === 'locked')
+	const featured = items.find((item) => stateOf(item) !== 'active')
 	const wallpapers = (wallpaperData?.wallpapers ?? []).map(wallpaperToStoreItem)
 	const shelf = (...types: StoreItemType[]) =>
 		sortByState(

@@ -29,7 +29,7 @@ The backend team keeps a Swagger for the whole API, including the admin routes. 
 
 **Signing in.** `POST /auth/signin`, `POST /auth/oauth/google` and `POST /auth/otp/verify` answer with the access token in `data`. The refresh token arrives in the `refresh_token` response header. The app stores them under the storage keys `auth_token` and `refresh_token`.
 
-**Refreshing.** On a `401` the client calls `POST /auth/refresh` with `{ refresh_token }`, takes the new access token from `data`, and repeats the request once. If that fails it logs the user out. The sign-in routes skip this step.
+**Refreshing.** On a `401` from a request carrying authorization, the client calls `POST /auth/refresh` with `{ refresh_token }`, takes the new access token from `data`, and repeats the request once. If that fails it logs the user out. The sign-in routes skip this step.
 
 **Errors.** A failed request answers `{ statusCode, success: false, message }`. `message` is a code such as `NOT_FOUND`, and the app turns it into Persian text with `translateError` in `src/common/utils/translate-error.ts`. A request with invalid fields may also carry `formValidation: [{ property, message }]`.
 
@@ -107,7 +107,6 @@ Source: `src/services/user`, `src/services/date`
 | `POST /google/connect` | yes | | `{ url }`. Open it to let the user connect Google. `google` is the only platform |
 | `POST /google/disconnect` | yes | | |
 | `GET /google/events` | yes | `start`, `end`: dates, URL encoded | `{ events: [] }`, Google Calendar events. See `GoogleCalendarEvent` in `src/services/date/get-google-calendar-events.hook.ts` |
-| `GET /users/@me/rewards` | yes | `page`, `limit` | `{ code, tasks, referrals, totalPages, totalCount }`. A task is `{ task, reward_coin, isDone, icon, button? }` and a referral is `{ name, avatar, username }` |
 | `GET /users/@me/rewards/code` | yes | | `{ referralCode }` |
 
 ## Friends and activities
@@ -311,14 +310,8 @@ Source: `src/services/market`, `src/services/gallery`, `src/services/mini-apps`
 |---|---|---|---|
 | `GET /market` | yes | `page`, `limit`, `type` | `{ items, totalPages, total? }` |
 | `GET /market/@me/inventory` | yes | `page`, `limit`, `type` | `{ fonts, browser_titles, themes, pets?, pet_backgrounds?, pagination: { totalPages, total } }` |
-| `POST /market/purchase` | yes | `{ itemId* }` | `{ success, message, remainingCoins }` |
-| `GET /market/packages/coins` | yes | `page`, `limit` | `{ data: { packages, totalPages, currentPage, totalCount } }`. A package is `{ id, price, title, description, coin }` |
-| `POST /market/packages/coins/purchase` | yes | `{ packageId* }` | `{ data: { url } }`. The app sends the user to `url` to pay |
-| `GET /market/packages/vip` | yes | | `{ data: { packages } }`. A plan is `{ id, title, price, days, isActive, isClaimed?, order?, meta?, createdAt?, updatedAt? }` |
-| `POST /market/packages/vip/purchase` | yes | `{ packageId* }` | `{ data: { url?, isFree?, activated?, days? } }`. The app also accepts the same fields without `data`. A `url` sends the user to pay |
 | `GET /gallery` | no | `page`, `limit`, `type`, `category`. `type` is `PHOTO_FRAME`, `BOOKMARK_ICON` or `AVATAR` | `{ data: { assets, pagination: { page, limit, total, totalPages } } }` |
 | `GET /gallery/categories` | no | `type` | `{ data: { categories: string[] } }` |
-| `POST /gallery/{id}/purchase` | yes | | `{ data: { success, asset } }` |
 | `GET /mini-apps/beta/list` | yes | `page`, `limit` | `{ data: { miniApps, totalPages, totals } }` |
 | `GET /mini-apps/beta/app-id/{appId}` | yes | | `{ data: MiniApp }`, which also has `isLaunchedByUser` |
 | `POST /mini-apps/beta/launch` | yes | `{ appId* }` | `{ data: { launchUrl, origin, data, signature } }` |
@@ -356,7 +349,6 @@ The app wins, so this file follows it. The backend team can use this list to cor
 | `GET /news/rss` | sends `url` and `sourceName` | declares no query |
 | `GET /todos/v2/@me` | also sends `dateFilter` and `category` | declares `page`, `limit`, `isCompleted` only |
 | `GET /pomodoro/tops` | sends `type` | declares no query |
-| `GET /market/packages/coins` | sends `page` and `limit` | declares no query |
 | `GET /date/owghat` | sends `lat` and `lan` | declares `lat` and `long`. If the Swagger is right, the longitude never reaches the server |
 | `GET /weather/current` | sends only `addForecast` | requires `useAI` and `addForecast`, and lists `lat`, `lon`, `count` |
 | `GET /users/@me/moods/stats` | sends no query | declares `year` and `month` |

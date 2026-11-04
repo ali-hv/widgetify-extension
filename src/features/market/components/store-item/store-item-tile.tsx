@@ -16,7 +16,7 @@ export function StoreItemTile({ item, state, onOpen, selected }: StoreItemTilePr
 			media={<ItemPreview item={item} />}
 			aspect={previewAspect(item.type)}
 			title={item.name}
-			meta={<ItemStateTag state={state} price={item.price} />}
+			meta={<ItemStateTag state={state} />}
 			selected={selected}
 			onClick={onOpen}
 		/>

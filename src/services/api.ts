@@ -1,3 +1,5 @@
+import { getFromStorage, setToStorage } from '@/common/storage'
+import { callEvent } from '@/common/utils/call-event'
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
@@ -5,8 +7,7 @@ import axios, {
 	type AxiosResponse,
 	type InternalAxiosRequestConfig,
 } from 'axios'
-import { getFromStorage, setToStorage } from '@/common/storage'
-import { callEvent } from '@/common/utils/call-event'
+import { shouldRefreshAuth } from './auth/should-refresh-auth'
 
 export type ApiError = AxiosError
 
@@ -75,7 +76,13 @@ export function getMainClient(): AxiosInstance {
 				return Promise.reject(error)
 			}
 
-			if (error.response?.status === 401 && !originalRequest._retry) {
+			if (
+				shouldRefreshAuth(
+					error.response?.status,
+					Boolean(originalRequest.headers.Authorization),
+					originalRequest._retry
+				)
+			) {
 				originalRequest._retry = true
 
 				try {

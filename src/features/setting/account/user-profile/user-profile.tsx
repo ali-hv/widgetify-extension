@@ -1,20 +1,18 @@
 import { t } from '@/common/i18n'
-import { useEffect } from 'react'
-import { Button, SectionPanel, Spinner } from '@/components/ui'
+import { showToast } from '@/common/toast'
+import { translateError } from '@/common/utils/translate-error'
+import { Button, ConfirmationModal, SectionPanel, Spinner } from '@/components/ui'
 import { useAuth } from '@/context/auth.context'
+import { Icon } from '@/icons'
 import { useGetOrCreateReferralCode } from '@/services/user/referrals-service.hook'
 import {
 	useGetUserProfile,
 	useSendVerificationEmail,
 } from '@/services/user/user-service.hook'
+import { useEffect } from 'react'
 import { AccountVerificationStatus } from '../components/account-verification-status'
 import { ProfileDisplay } from '../components/profile-display'
 import { ReferralCodeSection } from '../components/referral-code-section'
-import { showToast } from '@/common/toast'
-import { translateError } from '@/common/utils/translate-error'
-import { ConfirmationModal } from '@/components/ui'
-import { VipBannerCard } from './components/vip-banner-card'
-import { Icon } from '@/icons'
 
 export const UserProfile = () => {
 	const { logout } = useAuth()
@@ -83,7 +81,6 @@ export const UserProfile = () => {
 
 	return (
 		<div className="flex flex-col gap-4">
-			<VipBannerCard />
 			<ProfileDisplay />
 			{profile?.email && !profile?.verified && (
 				<AccountVerificationStatus

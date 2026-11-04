@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react'
 import { t } from '@/common/i18n'
 import { cn } from '@/common/utils/cn'
-import { Badge, Button, Chip, TextInput, VipBadge } from '@/components/ui'
+import { Badge, Button, Chip, TextInput } from '@/components/ui'
 import { WidgetIcon } from '@/features/widgets/components/widget-icon'
 import type {
 	WidgetCategory,
 	WidgetDefinition,
 } from '@/features/widgets/utils/layout-engine/types'
 import { Icon } from '@/icons'
+import { useEffect, useRef } from 'react'
 import { widgetTitle } from '../../utils/partner-catalog/partner-definitions'
 import type { CategoryItem } from '../types'
 import type { CatalogView } from '../utils/catalog-filter'
@@ -23,8 +23,7 @@ interface AddWidgetGridProps {
 	selectedId: string
 	onSelectWidget: (id: string) => void
 	runtimeLayout: { id: string }[]
-	isVip: boolean
-	isWidgetVipOnly: (id: string) => boolean
+
 	isWidgetNew: (id: string) => boolean
 }
 
@@ -33,7 +32,7 @@ interface CardProps {
 	isSelected: boolean
 	activeCount: number
 	isNew: boolean
-	showVip: boolean
+
 	onSelect: () => void
 }
 
@@ -42,7 +41,7 @@ function WidgetCard({
 	isSelected,
 	activeCount,
 	isNew,
-	showVip,
+
 	onSelect,
 }: CardProps) {
 	return (
@@ -76,10 +75,10 @@ function WidgetCard({
 				{widgetTitle(definition, t)}
 			</span>
 
-			{(isNew || showVip || activeCount > 0) && (
+			{(isNew || activeCount > 0) && (
 				<span className="flex items-center gap-1 shrink-0">
 					{isNew && <Badge>{t('widgets.catalog.badge.new')}</Badge>}
-					{showVip && <VipBadge size="xs" text={t('ui.vip.pro')} />}
+
 					{activeCount > 0 && (
 						<span className="text-3xs px-1.5 py-0.5 rounded-lg bg-brand-fill text-brand font-medium">
 							{definition.canDuplicate && activeCount > 1
@@ -104,8 +103,7 @@ export function AddWidgetGrid({
 	selectedId,
 	onSelectWidget,
 	runtimeLayout,
-	isVip,
-	isWidgetVipOnly,
+
 	isWidgetNew,
 }: AddWidgetGridProps) {
 	const listRef = useRef<HTMLDivElement>(null)
@@ -132,7 +130,6 @@ export function AddWidgetGrid({
 						runtimeLayout.filter((item) => item.id === definition.id).length
 					}
 					isNew={isWidgetNew(definition.id)}
-					showVip={!isVip && isWidgetVipOnly(definition.id)}
 					onSelect={() => onSelectWidget(definition.id)}
 				/>
 			))}

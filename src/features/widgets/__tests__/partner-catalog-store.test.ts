@@ -11,7 +11,6 @@ function item(key: string): PartnerCatalogItem {
 		iconUrl: null,
 		description: null,
 		category: 'info',
-		isVipOnly: false,
 		isNew: false,
 		allowedSizes: [{ w: 2, h: 1 }],
 		defaultSize: { w: 2, h: 1 },

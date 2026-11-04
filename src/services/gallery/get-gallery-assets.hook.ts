@@ -1,7 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getMainClient } from '@/services/api'
 import { galleryKeys } from '@/services/gallery/gallery.keys'
-import { userKeys } from '@/services/user/user.keys'
+import { useQuery } from '@tanstack/react-query'
 
 export type GalleryAssetType = 'PHOTO_FRAME' | 'BOOKMARK_ICON' | 'AVATAR'
 
@@ -68,16 +67,6 @@ async function getGalleryCategories(type?: GalleryAssetType): Promise<string[]> 
 	return data.data.categories
 }
 
-async function purchaseGalleryAsset(
-	assetId: string
-): Promise<{ data: { success: boolean; asset: GalleryAsset } }> {
-	const client = getMainClient()
-	const { data } = await client.post<{
-		data: { success: boolean; asset: GalleryAsset }
-	}>(`/gallery/${assetId}/purchase`)
-	return data
-}
-
 export function useGetGalleryAssets(params: GetGalleryParams = {}, enabled = true) {
 	return useQuery<GalleryResponse>({
 		queryKey: galleryKeys.assetsPage(params),
@@ -93,17 +82,5 @@ export function useGetGalleryCategories(type?: GalleryAssetType, enabled = true)
 		queryFn: () => getGalleryCategories(type),
 		staleTime: 1000 * 60 * 10,
 		enabled,
-	})
-}
-
-export function usePurchaseGalleryAsset() {
-	const queryClient = useQueryClient()
-
-	return useMutation({
-		mutationFn: (assetId: string) => purchaseGalleryAsset(assetId),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: galleryKeys.assets })
-			queryClient.invalidateQueries({ queryKey: userKeys.profile })
-		},
 	})
 }

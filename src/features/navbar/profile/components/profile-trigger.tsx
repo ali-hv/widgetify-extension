@@ -1,8 +1,8 @@
+import { t } from '@/common/i18n'
+import { cn } from '@/common/utils/cn'
 import { AvatarComponent, ProgressRing } from '@/components/ui'
 import type { UserProfile } from '@/services/user/user-service.hook'
 import { NavIconButton } from '../../components/nav-icon-button'
-import { t } from '@/common/i18n'
-import { cn } from '@/common/utils/cn'
 
 interface ProfileTriggerProps {
 	user: UserProfile | null
@@ -17,8 +17,6 @@ export function ProfileTrigger({
 	profilePercentage,
 	onClick,
 }: ProfileTriggerProps) {
-	const showsProRing = !profilePercentage && Boolean(user?.isVip)
-
 	if (!isAuthenticated) {
 		return (
 			<NavIconButton
@@ -41,8 +39,7 @@ export function ProfileTrigger({
 			}
 			onClick={onClick}
 			className={cn(
-				'relative flex items-center justify-center cursor-pointer select-none group',
-				showsProRing && 'm-1'
+				'relative flex items-center justify-center cursor-pointer select-none group'
 			)}
 		>
 			{profilePercentage ? (
@@ -54,7 +51,7 @@ export function ProfileTrigger({
 				/>
 			) : null}
 			<div className="relative flex items-center justify-center">
-				<AvatarComponent url={user?.avatar} size="sm" isPro={showsProRing} />
+				<AvatarComponent url={user?.avatar} size="sm" />
 			</div>
 		</button>
 	)

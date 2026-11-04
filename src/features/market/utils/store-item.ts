@@ -7,7 +7,6 @@ import type {
 	StoreItemType,
 	StoreTarget,
 	StoreView,
-	WallpaperAccess,
 	WallpaperKind,
 } from '../types'
 
@@ -21,7 +20,7 @@ const MARKET_ITEM_TYPES: StoreItemType[] = [
 
 const TRY_ON_TYPES: StoreItemType[] = ['THEME', 'FONT', 'BROWSER_TITLE', 'WALLPAPER']
 
-const STATE_ORDER: Record<ItemState, number> = { locked: 0, free: 1, owned: 2, active: 3 }
+const STATE_ORDER: Record<ItemState, number> = { free: 0, active: 1 }
 
 const VIEW_BY_FILTER: Record<string, StoreView> = {
 	THEME: 'THEME',
@@ -33,7 +32,6 @@ const VIEW_BY_FILTER: Record<string, StoreView> = {
 }
 
 const VIEW_BY_TAB: Record<string, StoreView> = {
-	coins: 'wallet',
 	wallpapers: 'WALLPAPER',
 	other: 'home',
 }
@@ -99,28 +97,17 @@ export function isAnimatedWallpaper(wallpaper: Wallpaper): boolean {
 
 export function matchesWallpaperFilter(
 	wallpaper: Wallpaper,
-	access: WallpaperAccess,
 	kind: WallpaperKind
 ): boolean {
 	const animated = isAnimatedWallpaper(wallpaper)
 	if (kind === 'image' && animated) return false
 	if (kind === 'animated' && !animated) return false
-	if (access === 'free') return !wallpaper.coin
-	if (access === 'coin') return Boolean(wallpaper.coin) && !wallpaper.isOwned
-	if (access === 'mine') return Boolean(wallpaper.isOwned)
 	return true
 }
 
 export function getItemState(item: StoreItem, activeValue?: string): ItemState {
 	if (activeValue && activeValue === item.value) return 'active'
-	if (item.isOwned) return 'owned'
-	if (item.price === 0) return 'free'
-	return 'locked'
-}
-
-export function needsPurchase(item: StoreItem): boolean {
-	if (item.isOwned) return false
-	return item.type !== 'WALLPAPER' || item.price > 0
+	return 'free'
 }
 
 export function uniqueByValue(items: StoreItem[]): StoreItem[] {
@@ -142,28 +129,6 @@ export function sortByState(
 export function toStoreTarget(tab?: string, filter?: string): StoreTarget {
 	const view = (filter && VIEW_BY_FILTER[filter]) || (tab && VIEW_BY_TAB[tab]) || 'home'
 	return { view, petKind: filter === 'PET_BACKGROUND' ? 'PET_BACKGROUND' : 'PET' }
-}
-
-export function pickTopUpPackage<T extends { coin: number; price: number }>(
-	packages: T[],
-	shortfall: number
-): T | undefined {
-	const enough = packages.filter((pkg) => pkg.coin >= shortfall)
-	if (enough.length === 0) return [...packages].sort((a, b) => b.coin - a.coin)[0]
-	return [...enough].sort((a, b) => a.price - b.price)[0]
-}
-
-function pricePerHundredCoins(pkg: { coin: number; price: number }): number {
-	return Math.round((pkg.price / pkg.coin) * 100)
-}
-
-export function bestValuePackageId<T extends { id: string; coin: number; price: number }>(
-	packages: T[]
-): string | undefined {
-	if (packages.length < 2) return undefined
-	return [...packages].sort(
-		(a, b) => pricePerHundredCoins(a) - pricePerHundredCoins(b)
-	)[0].id
 }
 
 export function faNumber(value: number): string {

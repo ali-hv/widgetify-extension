@@ -1,13 +1,6 @@
-import type React from 'react'
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from 'react'
+import Analytics from '@/analytics'
+import { useAppearance } from '@/context/appearance.context'
+import { useAuth } from '@/context/auth.context'
 import {
 	DEFAULT_CELL_HEIGHT,
 	DEFAULT_COLS,
@@ -19,21 +12,28 @@ import {
 	type StoredWidget,
 	WidgetKeys,
 } from '@/features/widgets/utils/layout-engine/types'
-import { useAppearance } from '@/context/appearance.context'
-import { useAuth } from '@/context/auth.context'
-import Analytics from '@/analytics'
-import { reflowForColumns } from './utils/widget-layout-helpers'
-import type { LayoutSyncStatus } from './utils/layout-sync'
-import { useWidgetSync } from './hooks/use-widget-sync'
-import { useWidgetOperations } from './hooks/use-widget-operations'
-import { useWidgetDrag } from './hooks/use-widget-drag'
+import type React from 'react'
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react'
 import { usePartnerCatalogSync } from './hooks/use-partner-catalog-sync'
+import { useWidgetDrag } from './hooks/use-widget-drag'
+import { useWidgetOperations } from './hooks/use-widget-operations'
+import { useWidgetSync } from './hooks/use-widget-sync'
 import type {
 	FreeWidgetActions,
 	FreeWidgetContextType,
 	FreeWidgetDerivedState,
 	FreeWidgetLayoutState,
 } from './types'
+import type { LayoutSyncStatus } from './utils/layout-sync'
+import { reflowForColumns } from './utils/widget-layout-helpers'
 
 export type {
 	FreeWidgetActions,
@@ -54,7 +54,7 @@ interface LayoutSyncState {
 const LayoutSyncContext = createContext<LayoutSyncState | null>(null)
 
 export function FreeWidgetProvider({ children }: { children: React.ReactNode }) {
-	const { isAuthenticated, isVip, token } = useAuth()
+	const { isAuthenticated, token } = useAuth()
 	usePartnerCatalogSync()
 	const { canvasMode, setCanvasMode, selectedInstanceId, setSelectedInstanceId } =
 		useAppearance()
@@ -71,13 +71,9 @@ export function FreeWidgetProvider({ children }: { children: React.ReactNode }) 
 	const savedLayoutRef = useRef<StoredWidget[]>([])
 	const colsRef = useRef<number>(DEFAULT_COLS)
 	const runtimeLayoutRef = useRef<StoredWidget[]>([])
-	const isVipRef = useRef<boolean>(isVip)
 	const selectedInstanceIdRef = useRef<string | null>(selectedInstanceId)
 	const isEditingRef = useRef<boolean>(canvasMode === 'edit')
 
-	useEffect(() => {
-		isVipRef.current = isVip
-	}, [isVip])
 	useEffect(() => {
 		selectedInstanceIdRef.current = selectedInstanceId
 	}, [selectedInstanceId])
@@ -144,7 +140,6 @@ export function FreeWidgetProvider({ children }: { children: React.ReactNode }) 
 		runtimeLayoutRef,
 		savedLayoutRef,
 		colsRef,
-		isVipRef,
 		selectedInstanceIdRef,
 		isAuthenticated,
 		isEditingRef,

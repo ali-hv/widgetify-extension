@@ -3,7 +3,6 @@ import { cn } from '@/common/utils/cn'
 import { Icon } from '@/icons'
 import { STORE_NAV } from '../constants'
 import type { StoreView } from '../types'
-import { WalletCard } from './wallet-card'
 
 interface StoreNavProps {
 	view: StoreView
@@ -49,7 +48,6 @@ export function StoreNav({ view, hasNew, onChange }: StoreNavProps) {
 					)
 				})}
 			</ul>
-			<WalletCard selected={view === 'wallet'} onOpen={() => onChange('wallet')} />
 		</nav>
 	)
 }

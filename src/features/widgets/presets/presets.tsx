@@ -1,18 +1,16 @@
+import Analytics from '@/analytics'
+import { t } from '@/common/i18n'
+import { cn } from '@/common/utils/cn'
+import { Button, ConfirmationModal, Modal } from '@/components/ui'
+import { useFreeWidgetActions } from '@/features/widgets/widgets.context'
+import { Icon } from '@/icons'
 import type React from 'react'
 import { memo, useState } from 'react'
-import Analytics from '@/analytics'
-import { Button, ConfirmationModal, Modal, VipBadge } from '@/components/ui'
-import { Icon } from '@/icons'
-import { callEvent } from '@/common/utils/call-event'
-import { cn } from '@/common/utils/cn'
-import { useAuth } from '@/context/auth.context'
-import { useFreeWidgetActions } from '@/features/widgets/widgets.context'
 import { getWidgetRegistry } from '../registry'
-import { PRESET_LAYOUTS } from './constants'
 import { PresetCanvasPreview } from './components/preset-canvas-preview'
-import { resolvePresetWidgetsForViewport } from './utils/viewport'
+import { PRESET_LAYOUTS } from './constants'
 import type { PresetLayout } from './types'
-import { t } from '@/common/i18n'
+import { resolvePresetWidgetsForViewport } from './utils/viewport'
 
 interface PresetLayoutModalProps {
 	isOpen: boolean
@@ -25,25 +23,13 @@ const PresetLayoutModalComponent: React.FC<PresetLayoutModalProps> = ({
 	isOpen,
 	onClose,
 }) => {
-	const { isVip } = useAuth()
 	const { applyPresetLayout } = useFreeWidgetActions()
 
 	const [selectedPresetToApply, setSelectedPresetToApply] =
 		useState<PresetLayout | null>(null)
 	const [isApplying, setIsApplying] = useState(false)
 
-	const handleOpenVipSettings = () => {
-		Analytics.event('widget_presets_pro_locked')
-		callEvent('openSettings', 'vip')
-		onClose()
-	}
-
 	const handleRequestApply = (preset: PresetLayout) => {
-		if (preset.isVip && !isVip) {
-			handleOpenVipSettings()
-			return
-		}
-
 		setSelectedPresetToApply(preset)
 	}
 
@@ -88,7 +74,6 @@ const PresetLayoutModalComponent: React.FC<PresetLayoutModalProps> = ({
 
 					<ul className="grid flex-1 min-h-0 grid-cols-1 gap-3 p-1 overflow-y-auto sm:grid-cols-2">
 						{PRESET_LAYOUTS.map((preset) => {
-							const isLocked = preset.isVip && !isVip
 							const widgetIds = Array.from(
 								new Set(preset.widgets.map((widget) => widget.id))
 							)
@@ -104,9 +89,7 @@ const PresetLayoutModalComponent: React.FC<PresetLayoutModalProps> = ({
 									<article
 										className={cn(
 											'group flex flex-col w-full gap-3 p-3.5 text-right border rounded-2xl bg-fill shadow-sm transition-ui hover:shadow-md',
-											preset.isVip
-												? 'border-vip-fill-2 hover:border-vip'
-												: 'border-line hover:border-brand-muted'
+											'border-line hover:border-brand-muted'
 										)}
 									>
 										<PresetCanvasPreview preset={preset} />
@@ -117,18 +100,9 @@ const PresetLayoutModalComponent: React.FC<PresetLayoutModalProps> = ({
 													{t(preset.titleKey)}
 												</h4>
 
-												{preset.isVip ? (
-													<VipBadge
-														size="xs"
-														variant="subtle"
-														className="mt-0.5"
-														text={t('ui.vip.pro')}
-													/>
-												) : (
-													<span className="mt-0.5 shrink-0 rounded-full border border-success-fill-2 bg-success-fill px-2 py-0.5 text-4xs font-bold text-success">
-														{t('widgets.presets.free')}
-													</span>
-												)}
+												<span className="mt-0.5 shrink-0 rounded-full border border-success-fill-2 bg-success-fill px-2 py-0.5 text-4xs font-bold text-success">
+													{t('widgets.presets.free')}
+												</span>
 											</div>
 
 											<p className="text-2xs leading-relaxed text-fg-muted line-clamp-2 min-h-8">
@@ -169,47 +143,20 @@ const PresetLayoutModalComponent: React.FC<PresetLayoutModalProps> = ({
 										</div>
 
 										<div className="pt-3 mt-auto border-t border-line">
-											{isLocked ? (
-												<Button
-													onClick={handleOpenVipSettings}
-													fullWidth
-													size="sm"
-													rounded="xl"
-													variant="outline"
-													color="vip"
-													className="font-bold"
-													icon={
-														<Icon name="diamond" size={12} />
-													}
-													aria-label={t(
-														'widgets.presets.upgradeAria',
-														{ title: t(preset.titleKey) }
-													)}
-												>
-													<span>
-														{t('widgets.presets.upgrade')}
-													</span>
-												</Button>
-											) : (
-												<Button
-													onClick={() =>
-														handleRequestApply(preset)
-													}
-													fullWidth
-													size="sm"
-													rounded="xl"
-													color="brand"
-													className="font-bold shadow-sm"
-													aria-label={t(
-														'widgets.presets.applyAria',
-														{ title: t(preset.titleKey) }
-													)}
-												>
-													<span>
-														{t('widgets.presets.apply')}
-													</span>
-												</Button>
-											)}
+											<Button
+												onClick={() => handleRequestApply(preset)}
+												fullWidth
+												size="sm"
+												rounded="xl"
+												color="brand"
+												className="font-bold shadow-sm"
+												aria-label={t(
+													'widgets.presets.applyAria',
+													{ title: t(preset.titleKey) }
+												)}
+											>
+												<span>{t('widgets.presets.apply')}</span>
+											</Button>
 										</div>
 									</article>
 								</li>

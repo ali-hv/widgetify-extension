@@ -1,9 +1,8 @@
 import { t } from '@/common/i18n'
 import { Button } from '@/components/ui'
 import { Icon } from '@/icons'
-import { ITEM_TYPE_META } from '../../constants'
 import { ItemPreview } from '../../components/previews/item-preview'
-import { CoinAmount } from '../../components/store-item/coin-amount'
+import { ITEM_TYPE_META } from '../../constants'
 import type { StoreItem } from '../../types'
 
 interface FeaturedBannerProps {
@@ -33,13 +32,11 @@ export function FeaturedBanner({ item, onOpen }: FeaturedBannerProps) {
 					</p>
 				)}
 				<div className="flex items-center justify-between gap-2 pt-1">
-					{item.price > 0 ? (
-						<CoinAmount amount={item.price} size="md" />
-					) : (
+					{
 						<span className="text-sm font-bold text-fg-strong">
 							{t('market.itemState.free')}
 						</span>
-					)}
+					}
 					<Button color="brand" size="sm" onClick={onOpen}>
 						{t('market.featured.seeIt')}
 					</Button>

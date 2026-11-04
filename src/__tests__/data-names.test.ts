@@ -60,6 +60,16 @@ const STORAGE_KEYS = [
 ]
 
 const ANALYTICS_EVENTS = [
+	'gallery_opened',
+	'gallery_load_failed',
+	'gallery_selected',
+	'market_item_apply_started',
+	'market_item_apply_failed',
+	'market_item_applied',
+	'photo_upload_opened',
+	'photo_uploaded',
+	'custom_wallpaper_upload_started',
+	'custom_wallpaper_upload_failed',
 	'todoist_view_selected',
 	'todoist_calendar_opened',
 	'todoist_calendar_load_failed',
@@ -297,6 +307,28 @@ const ANALYTICS_EVENTS = [
 	'yadkar_change_tab',
 ]
 
+const RETIRED_ANALYTICS_EVENTS = new Set<string>([
+	'coin_package_purchase_failed',
+	'coin_package_purchase_started',
+	'coin_package_purchase_unauthenticated',
+	'coin_package_purchased',
+	'market_item_purchase_failed',
+	'market_item_purchase_started',
+	'market_item_purchase_unauthenticated',
+	'market_item_purchased',
+	'mini_app_pro_gate_blocked',
+	'photo_upload_vip_required',
+	'transparent_clock_vip_required',
+	'vip_feature_details_activate_clicked',
+	'vip_feature_details_opened',
+	'vip_plan_purchase_failed',
+	'vip_plan_purchase_unauthenticated',
+	'vip_plan_purchased',
+	'vip_tab_opened',
+	'widget_catalog_pro_locked',
+	'widget_presets_pro_locked',
+])
+
 const WIDGET_IDS = [
 	'todoist',
 	'comboWidget',
@@ -401,7 +433,11 @@ describe('names that are data', () => {
 
 	it('keeps every analytics event under the name the dashboard already has', () => {
 		const sent = sentAnalyticsEvents()
-		expect(ANALYTICS_EVENTS.filter((name) => !sent.has(name))).toEqual([])
+		expect(
+			ANALYTICS_EVENTS.filter(
+				(name) => !sent.has(name) && !RETIRED_ANALYTICS_EVENTS.has(name)
+			)
+		).toEqual([])
 	})
 
 	it('keeps every widget id under the name saved layouts use', () => {

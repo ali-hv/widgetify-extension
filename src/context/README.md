@@ -34,3 +34,7 @@ A feature introduces itself once with `useFeatureIntro(id)` and the `Coachmark` 
 ## Tests
 
 `context/__tests__/reduced-motion.test.ts` and `context/__tests__/feature-intros.test.ts` cover the pure rules. Providers are not rendered in tests.
+
+## Free wallpaper selection
+
+`utils/wallpaper-sync.ts` keeps an unowned wallpaper with a legacy coin price out of the selection endpoint, which previously could charge coins. The wallpaper applies and persists locally with a `localOnly` marker. Account sync leaves that selection alone on reload, and choosing a synced wallpaper clears the marker. Local data URLs use the marker too. Free and already-owned wallpapers still sync. `__tests__/wallpaper-sync.test.ts` covers this boundary.

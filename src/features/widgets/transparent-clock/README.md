@@ -60,14 +60,11 @@ The sliders run left to right (`dir="ltr"` around each): in the right-to-left pa
 
 A modal (a fake preview beside the controls) and a `PopoverMenu` beside the clock (every control at once) were tried first and felt crowded.
 
-## Pro
+## Access and analytics
 
-The shape, the date line, the finish and the colour («سبک» and «رنگ») are pro; weight and size are free.
+Shape, date placement, finish, colour, weight and size are free. The editor starts on the style tab for everyone and draws the saved style without a subscription fallback. Old saved styles remain intact.
 
-- Without pro the editor opens on «ضخامت و اندازه», and «سبک» and «رنگ» carry the 💎 badge. A locked tab still shows its controls, faded and inert, under one line and «ارتقا به پرو», which drops the draft and opens the pro tab of settings (`openSettings`, `'vip'`), like the photo widget.
-- The clock draws `toFreeClockStyle(style)` without pro: the default shape, finish, date position and colour with the stored weight and size. The pro values stay in `meta`, so they come back when pro does, the way a pro size on the canvas locks and unlocks.
-
-Analytics: `transparent_clock_settings_opened` when the editor opens, `transparent_clock_style_saved` on save, `transparent_clock_vip_required` on «ارتقا به پرو».
+Analytics: `transparent_clock_settings_opened` when the editor opens and `transparent_clock_style_saved` on save.
 
 ## Layout and menu
 
@@ -83,4 +80,4 @@ The face draws ⋯ with `tone="onColor"` inside a span in the wallpaper colour, 
 
 ## Not checked on screen
 
-Every shape, solid and glass, on a bright, a dark and a busy wallpaper and with no wallpaper, at 2x1, 2x2 and 4x2 and in both models. Size 130% in 2x1 may crowd the date line. The spotlight and the bar over every wallpaper and with none; the locked tabs signed out and signed in without pro; the swatch tooltips inside the top layer; the bar at 500px wide.
+Every shape, solid and glass, on a bright, a dark and a busy wallpaper and with no wallpaper, at 2x1, 2x2 and 4x2 and in both models. Size 130% in 2x1 may crowd the date line. The spotlight and the bar over every wallpaper and with none; all tabs signed out and signed in; the swatch tooltips inside the top layer; the bar at 500px wide.

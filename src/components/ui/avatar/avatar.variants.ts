@@ -17,14 +17,9 @@ export const avatarVariants = cva(
 				md: ['w-10', 'h-10', 'text-base'],
 				xl: ['w-16', 'h-16', 'text-xl'],
 			},
-			isPro: {
-				true: 'ring-2 ring-vip ring-offset-2 ring-offset-surface',
-				false: '',
-			},
 		},
 		defaultVariants: {
 			size: 'md',
-			isPro: false,
 		},
 	}
 )

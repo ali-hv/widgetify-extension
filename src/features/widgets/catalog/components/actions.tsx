@@ -1,43 +1,17 @@
 import { t } from '@/common/i18n'
 import { Button } from '@/components/ui'
 import type { WidgetSize } from '@/features/widgets/utils/layout-engine/types'
-import { Icon } from '@/icons'
 
 interface AddWidgetActionsProps {
-	isVipRequired: boolean
-	isVip: boolean
 	isEditMode: boolean
-	isLimitReached: boolean
+
 	canAddCustom: boolean
 	isCurrentlyActive: boolean
-	isDuplicateRestricted?: boolean
+
 	selectedSize: WidgetSize
 	isLoading?: boolean
 	onSave: () => void
 	onRemove: () => void
-	onUpgrade: () => void
-}
-
-function ProUpgradeButton({
-	label,
-	onUpgrade,
-}: {
-	label: string
-	onUpgrade: () => void
-}) {
-	return (
-		<Button
-			type="button"
-			onClick={onUpgrade}
-			className="w-full gap-2 font-bold"
-			rounded={'2xl'}
-			variant={'outline'}
-			color={'vip'}
-		>
-			<Icon name="diamond" size={14} />
-			<span>{label}</span>
-		</Button>
-	)
 }
 
 function RemoveFromPageButton({ onRemove }: { onRemove: () => void }) {
@@ -56,32 +30,16 @@ function RemoveFromPageButton({ onRemove }: { onRemove: () => void }) {
 }
 
 export function AddWidgetActions({
-	isVipRequired,
-	isVip,
 	isEditMode,
-	isLimitReached,
+
 	canAddCustom,
 	isCurrentlyActive,
-	isDuplicateRestricted = false,
+
 	selectedSize,
 	isLoading = false,
 	onSave,
 	onRemove,
-	onUpgrade,
 }: AddWidgetActionsProps) {
-	if (isVipRequired && !isVip) {
-		return (
-			<ProUpgradeButton
-				label={
-					isEditMode
-						? t('widgets.catalog.upgradeToSave')
-						: t('widgets.catalog.upgradeToEnable')
-				}
-				onUpgrade={onUpgrade}
-			/>
-		)
-	}
-
 	if (isEditMode) {
 		return (
 			<Button
@@ -95,31 +53,6 @@ export function AddWidgetActions({
 			>
 				<span>{t('widgets.catalog.saveChanges')}</span>
 			</Button>
-		)
-	}
-
-	if (isCurrentlyActive && (isLimitReached || isDuplicateRestricted)) {
-		return (
-			<div className="flex flex-col w-full gap-2">
-				<ProUpgradeButton
-					label={
-						isDuplicateRestricted
-							? t('widgets.catalog.duplicateProOnly')
-							: t('widgets.catalog.limitReached')
-					}
-					onUpgrade={onUpgrade}
-				/>
-				<RemoveFromPageButton onRemove={onRemove} />
-			</div>
-		)
-	}
-
-	if (isLimitReached) {
-		return (
-			<ProUpgradeButton
-				label={t('widgets.catalog.limitReached')}
-				onUpgrade={onUpgrade}
-			/>
 		)
 	}
 

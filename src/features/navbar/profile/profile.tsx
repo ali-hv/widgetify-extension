@@ -1,11 +1,11 @@
-import { lazy, Suspense, useState, useEffect } from 'react'
 import Analytics from '@/analytics'
+import { t } from '@/common/i18n'
 import { callEvent, listenEvent } from '@/common/utils/call-event'
 import { ConfirmationModal, Dropdown, Modal, Spinner } from '@/components/ui'
 import { useAuth } from '@/context/auth.context'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { ProfileDropdownMenu } from './components/profile-dropdown-menu'
 import { ProfileTrigger } from './components/profile-trigger'
-import { t } from '@/common/i18n'
 
 const AuthForm = lazy(() => import('@/features/setting/account/auth-form/auth-form'))
 
@@ -16,7 +16,7 @@ const WelcomeWizard = lazy(() =>
 )
 
 export function ProfileNav() {
-	const { user, isAuthenticated, isVip, profilePercentage, logout } = useAuth()
+	const { user, isAuthenticated, profilePercentage, logout } = useAuth()
 	const [showAuthModal, setShowAuthModal] = useState(false)
 	const [showLogoutModal, setShowLogoutModal] = useState(false)
 	const [openedWizard, setOpenedWizard] = useState(false)
@@ -76,7 +76,6 @@ export function ProfileNav() {
 				<ProfileDropdownMenu
 					user={user}
 					isAuthenticated={isAuthenticated}
-					isVip={Boolean(isVip)}
 					onRequestAuth={() => setShowAuthModal(true)}
 					onRequestLogout={() => setShowLogoutModal(true)}
 				/>

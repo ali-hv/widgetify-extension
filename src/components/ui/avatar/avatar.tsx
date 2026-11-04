@@ -1,6 +1,6 @@
+import { cn } from '@/common/utils/cn'
 import type { VariantProps } from 'class-variance-authority'
 import { useEffect, useState } from 'react'
-import { cn } from '@/common/utils/cn'
 import { avatarVariants } from './avatar.variants'
 
 interface AvatarProps extends VariantProps<typeof avatarVariants> {
@@ -8,7 +8,6 @@ interface AvatarProps extends VariantProps<typeof avatarVariants> {
 	file?: File | null
 	placeholder?: string
 	className?: string
-	isPro?: boolean
 }
 
 export function AvatarComponent({
@@ -17,7 +16,6 @@ export function AvatarComponent({
 	placeholder = '',
 	size,
 	className,
-	isPro,
 }: AvatarProps) {
 	const [imageError, setImageError] = useState(false)
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -48,7 +46,7 @@ export function AvatarComponent({
 	const shouldShowImage = displayUrl && !imageError
 
 	return (
-		<div className={cn(avatarVariants({ size, isPro }), className)}>
+		<div className={cn(avatarVariants({ size }), className)}>
 			{shouldShowImage ? (
 				<img
 					src={displayUrl}

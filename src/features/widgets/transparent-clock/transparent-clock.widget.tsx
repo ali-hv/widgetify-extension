@@ -1,20 +1,18 @@
-import { useRef } from 'react'
 import Analytics from '@/analytics'
 import { t } from '@/common/i18n'
-import { callEvent } from '@/common/utils/call-event'
 import { Badge, PopoverMenuItem } from '@/components/ui'
-import { useAuth } from '@/context/auth.context'
 import { useGeneralSetting } from '@/context/general-setting.context'
 import { useZonedClock } from '@/features/widgets/hooks/use-zoned-clock'
 import { Icon } from '@/icons'
+import { useRef } from 'react'
 import { WidgetContainer } from '../components/widget-container'
+import type { WidgetSize } from '../utils/layout-engine/types'
 import { useWidgetMenuActions } from '../widget-menu.context'
 import { ClockStyleEditor } from './components/clock-style-editor'
 import { CLOCK_FACE_LABELS, CLOCK_FINISH_LABELS } from './constants'
 import { useClockStyleDraft } from './hooks/use-clock-style-draft'
-import type { WidgetSize } from '../utils/layout-engine/types'
 import type { TransparentClockVariant } from './types'
-import { resolveClockFace, toFreeClockStyle } from './utils/normalize-style'
+import { resolveClockFace } from './utils/normalize-style'
 import { normalizeTransparentClockVariant } from './utils/normalize-variant'
 import { TransparentClockEnglish } from './variants/transparent-clock-english'
 import { TransparentClockPersian } from './variants/transparent-clock-persian'
@@ -40,8 +38,8 @@ export function TransparentClockWidget({
 
 	const variant = normalizeTransparentClockVariant(meta?.variant)
 	const draft = useClockStyleDraft(instanceId, meta)
-	const { isVip } = useAuth()
-	const editableStyle = isVip ? draft.style : toFreeClockStyle(draft.style)
+
+	const editableStyle = draft.style
 	const clockStyle = size
 		? { ...editableStyle, face: resolveClockFace(editableStyle.face, size) }
 		: editableStyle
@@ -55,12 +53,6 @@ export function TransparentClockWidget({
 	const saveStyle = () => {
 		Analytics.event('transparent_clock_style_saved')
 		draft.save()
-	}
-
-	const openVip = () => {
-		Analytics.event('transparent_clock_vip_required')
-		draft.cancel()
-		callEvent('openSettings', 'vip')
 	}
 
 	useWidgetMenuActions(
@@ -104,8 +96,6 @@ export function TransparentClockWidget({
 				onChange={draft.update}
 				onSave={saveStyle}
 				onCancel={draft.cancel}
-				isVip={isVip}
-				onUpgrade={openVip}
 			/>
 		</WidgetContainer>
 	)

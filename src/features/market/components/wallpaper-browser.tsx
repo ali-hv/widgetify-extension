@@ -1,5 +1,4 @@
 import { t } from '@/common/i18n'
-import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { Button, Chip, EmptyState, ScrollRow, TabNavigation } from '@/components/ui'
 import { useWallpaperContext } from '@/context/wallpaper.context'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
@@ -7,9 +6,10 @@ import {
 	useGetWallpaperCategories,
 	useGetWallpapersInfiniteQuery,
 } from '@/services/wallpapers/get-wallpaper-categories.hook'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { useItemState } from '../hooks/use-item-state'
 import { useStoreTryOn } from '../store-try-on.context'
-import type { StoreItem, WallpaperAccess, WallpaperKind } from '../types'
+import type { StoreItem, WallpaperKind } from '../types'
 import {
 	faNumber,
 	matchesWallpaperFilter,
@@ -20,13 +20,6 @@ import { TileGrid, TileSkeletons } from './tile-grid'
 
 const PAGE_SIZE = 18
 
-const ACCESS_TABS: { id: WallpaperAccess; label: string }[] = [
-	{ id: 'all', label: t('market.category.allFilter') },
-	{ id: 'free', label: t('market.itemState.free') },
-	{ id: 'coin', label: t('market.wallpaperBrowser.coinFilter') },
-	{ id: 'mine', label: t('market.wallpaperBrowser.ownedFilter') },
-]
-
 const KIND_TABS: { id: WallpaperKind; label: string }[] = [
 	{ id: 'all', label: t('market.category.allFilter') },
 	{ id: 'image', label: t('market.wallpaperBrowser.staticFilter') },
@@ -36,22 +29,15 @@ const KIND_TABS: { id: WallpaperKind; label: string }[] = [
 interface WallpaperBrowserProps {
 	selectedId: string | null
 	onPick: (item: StoreItem) => void
-	defaultAccess?: WallpaperAccess
 	leading?: ReactNode
 }
 
-export function WallpaperBrowser({
-	selectedId,
-	onPick,
-	defaultAccess = 'all',
-	leading,
-}: WallpaperBrowserProps) {
+export function WallpaperBrowser({ selectedId, onPick, leading }: WallpaperBrowserProps) {
 	const { data: folders } = useGetWallpaperCategories()
 	const { syncWithFetchedWallpapers } = useWallpaperContext()
 	const stateOf = useItemState()
 	const { tryOn } = useStoreTryOn()
 	const [folderId, setFolderId] = useState<string | null>(null)
-	const [access, setAccess] = useState<WallpaperAccess>(defaultAccess)
 	const [kind, setKind] = useState<WallpaperKind>('all')
 
 	const {
@@ -83,12 +69,11 @@ export function WallpaperBrowser({
 	}, [wallpapers])
 
 	const visible = wallpapers
-		.filter((wallpaper) => matchesWallpaperFilter(wallpaper, access, kind))
+		.filter((wallpaper) => matchesWallpaperFilter(wallpaper, kind))
 		.map(wallpaperToStoreItem)
 
 	const clearFilters = () => {
 		setFolderId(null)
-		setAccess('all')
 		setKind('all')
 	}
 
@@ -124,14 +109,6 @@ export function WallpaperBrowser({
 			</ScrollRow>
 
 			<div className="flex flex-wrap items-center justify-between gap-2">
-				<TabNavigation
-					tabs={ACCESS_TABS}
-					activeTab={access}
-					onTabClick={setAccess}
-					tabMode="simple"
-					size="sm"
-					className="w-72"
-				/>
 				<TabNavigation
 					tabs={KIND_TABS}
 					activeTab={kind}

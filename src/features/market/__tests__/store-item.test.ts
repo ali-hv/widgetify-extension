@@ -1,14 +1,11 @@
-import { describe, expect, it } from 'bun:test'
 import type { Wallpaper } from '@/common/types/wallpaper.interface'
 import { type MarketItem, MarketItemType } from '@/services/market/market.interface'
+import { describe, expect, it } from 'bun:test'
 import type { StoreItem } from '../types'
 import {
-	bestValuePackageId,
 	getItemState,
 	marketItemToStoreItem,
 	matchesWallpaperFilter,
-	needsPurchase,
-	pickTopUpPackage,
 	toStoreTarget,
 	uniqueByValue,
 	wallpaperToStoreItem,
@@ -42,15 +39,8 @@ function storeItem(overrides: Partial<StoreItem> = {}): StoreItem {
 	}
 }
 
-const PACKAGES = [
-	{ id: 'starter', coin: 180, price: 39000 },
-	{ id: 'silver', coin: 380, price: 69000 },
-	{ id: 'gold', coin: 850, price: 199000 },
-	{ id: 'platinum', coin: 2200, price: 249000 },
-]
-
 describe('marketItemToStoreItem', () => {
-	it('drops a type this version cannot show, so it never reaches a buy button', () => {
+	it('drops a type this version cannot show, so it never reaches a use button', () => {
 		expect(
 			marketItemToStoreItem(marketItem({ type: 'STICKER' as MarketItemType }))
 		).toBe(null)
@@ -97,19 +87,14 @@ describe('matchesWallpaperFilter', () => {
 		isOwned: true,
 	}
 
-	it('keeps a bought wallpaper out of the ones still for sale', () => {
-		expect(matchesWallpaperFilter(bought, 'coin', 'all')).toBe(false)
-		expect(matchesWallpaperFilter(bought, 'mine', 'all')).toBe(true)
-	})
-
 	it('counts a video as animated and not as a still', () => {
-		expect(matchesWallpaperFilter(bought, 'all', 'animated')).toBe(true)
-		expect(matchesWallpaperFilter(bought, 'all', 'image')).toBe(false)
+		expect(matchesWallpaperFilter(bought, 'animated')).toBe(true)
+		expect(matchesWallpaperFilter(bought, 'image')).toBe(false)
 	})
 
 	it('counts a gif as animated even though the server calls it an image', () => {
 		const gif: Wallpaper = { ...bought, type: 'IMAGE', src: 'rain.gif', coin: 0 }
-		expect(matchesWallpaperFilter(gif, 'free', 'animated')).toBe(true)
+		expect(matchesWallpaperFilter(gif, 'animated')).toBe(true)
 	})
 })
 
@@ -134,22 +119,8 @@ describe('getItemState', () => {
 		expect(getItemState(storeItem({ value: '', price: 0 }), '')).toBe('free')
 	})
 
-	it('locks a paid item nobody owns', () => {
-		expect(getItemState(storeItem(), 'light')).toBe('locked')
-	})
-})
-
-describe('needsPurchase', () => {
-	it('asks for a free market item to be claimed before it can be used', () => {
-		expect(needsPurchase(storeItem({ price: 0 }))).toBe(true)
-	})
-
-	it('lets a free wallpaper be picked straight away', () => {
-		expect(needsPurchase(storeItem({ type: 'WALLPAPER', price: 0 }))).toBe(false)
-	})
-
-	it('never charges for something already owned', () => {
-		expect(needsPurchase(storeItem({ isOwned: true }))).toBe(false)
+	it('allows an item with a legacy price without ownership', () => {
+		expect(getItemState(storeItem(), 'light')).toBe('free')
 	})
 })
 
@@ -161,31 +132,11 @@ describe('toStoreTarget', () => {
 		})
 	})
 
-	it('keeps the old coins tab working for callers that still send it', () => {
-		expect(toStoreTarget('coins').view).toBe('wallet')
+	it('opens the showcase for a retired coins tab', () => {
+		expect(toStoreTarget('coins').view).toBe('home')
 	})
 
 	it('opens the showcase when nothing is asked for', () => {
 		expect(toStoreTarget().view).toBe('home')
-	})
-})
-
-describe('pickTopUpPackage', () => {
-	it('picks the cheapest package that covers the shortfall', () => {
-		expect(pickTopUpPackage(PACKAGES, 200)?.id).toBe('silver')
-	})
-
-	it('falls back to the largest package when none covers it', () => {
-		expect(pickTopUpPackage(PACKAGES, 5000)?.id).toBe('platinum')
-	})
-})
-
-describe('bestValuePackageId', () => {
-	it('marks the package with the lowest price per coin', () => {
-		expect(bestValuePackageId(PACKAGES)).toBe('platinum')
-	})
-
-	it('marks nothing when there is nothing to compare', () => {
-		expect(bestValuePackageId(PACKAGES.slice(0, 1))).toBe(undefined)
 	})
 })

@@ -1,22 +1,14 @@
 import { t } from '@/common/i18n'
-import { useRef, useState } from 'react'
-import moment from 'jalali-moment'
 import {
 	AvatarComponent,
-	Button,
 	FloatingBadge,
 	PopoverMenu,
 	PopoverMenuItem,
-	Tooltip,
 } from '@/components/ui'
-import { UserCoin } from '@/components/user-coin'
-import { Icon } from '@/icons'
 import { useAuth } from '@/context/auth.context'
-import {
-	formatVipExpiryDate,
-	formatVipRemaining,
-} from '@/features/setting/utils/vip-expiry'
-import { callEvent } from '@/common/utils/call-event'
+import { Icon } from '@/icons'
+import moment from 'jalali-moment'
+import { useRef, useState } from 'react'
 
 interface ProfileHeaderProps {
 	onUploadFile: (file: File) => void
@@ -47,9 +39,6 @@ export const ProfileHeader = ({
 
 	const seed = (user?.username?.length || 0) + (user?.name?.length || 0)
 
-	const vipRemaining = formatVipRemaining(user?.vipExpiresAt)
-	const vipExpiryDate = formatVipExpiryDate(user?.vipExpiresAt)
-
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0]
 		if (file) {
@@ -67,61 +56,6 @@ export const ProfileHeader = ({
 				className="hidden"
 				onChange={handleFileChange}
 			/>
-
-			<div className="absolute z-10 top-4 left-4">
-				<button
-					type="button"
-					aria-label={t('setting.profileHeader.buyCoins')}
-					onClick={() => callEvent('openMarketModal', { tab: 'coins' })}
-					className="block cursor-pointer rounded-2xl focus-visible:focus-ring"
-				>
-					<UserCoin coins={user?.coins || 0} />
-				</button>
-			</div>
-
-			{user?.vipExpiresAt ? (
-				<div className="absolute z-10 top-4 right-4">
-					<Tooltip
-						content={
-							vipExpiryDate
-								? t('setting.profileHeader.validUntil', {
-										p0: vipExpiryDate,
-									})
-								: t('setting.profileHeader.proSubscription')
-						}
-					>
-						<Button
-							type="button"
-							onClick={() => callEvent('openSettings', 'vip')}
-							variant="outline"
-							color="vip"
-							size="sm"
-							rounded="2xl"
-							className="px-2.5 font-bold"
-						>
-							<Icon name="diamond" size={12} />
-							<span>
-								{t('setting.profileHeader.proCreditLabel')} {vipRemaining}
-							</span>
-						</Button>
-					</Tooltip>
-				</div>
-			) : user?.isVip ? (
-				<div className="absolute z-10 top-4 right-4">
-					<Button
-						type="button"
-						onClick={() => callEvent('openSettings', 'vip')}
-						variant="outline"
-						color="vip"
-						size="sm"
-						rounded="2xl"
-						className="px-2.5 font-bold"
-					>
-						<Icon name="diamond" size={12} />
-						<span>{t('setting.profileHeader.proSubscription')}</span>
-					</Button>
-				</div>
-			) : null}
 
 			<div className="absolute z-10 text-xs font-medium bottom-4 left-4 opacity-70">
 				<span>

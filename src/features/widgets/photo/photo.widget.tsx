@@ -1,24 +1,24 @@
-import { useRef, useState } from 'react'
 import Analytics from '@/analytics'
+import { t } from '@/common/i18n'
+import { showToast } from '@/common/toast'
+import { readFileDataUrl } from '@/common/utils/read-file-data-url'
+import { translateError } from '@/common/utils/translate-error'
+import { GalleryPickerModal } from '@/components/gallery'
+import { PopoverMenuItem, Spinner } from '@/components/ui'
+import { useAuth } from '@/context/auth.context'
+import { useGeneralSetting } from '@/context/general-setting.context'
+import { useFreeWidgets } from '@/features/widgets/widgets.context'
+import { Icon } from '@/icons'
+import { type ApiError, safeAwait } from '@/services/api'
+import type { GalleryAsset } from '@/services/gallery/get-gallery-assets.hook'
+import { uploadWidgetMediaApi } from '@/services/widgets/widget-media.hook'
+import { useRef, useState } from 'react'
 import { WidgetContainer } from '../components/widget-container'
 import { WidgetMenuButton } from '../components/widget-menu-button'
 import type { WidgetSize } from '../utils/layout-engine/types'
 import { useWidgetMenuActions } from '../widget-menu.context'
-import { useFreeWidgets } from '@/features/widgets/widgets.context'
-import { useAuth } from '@/context/auth.context'
-import { useGeneralSetting } from '@/context/general-setting.context'
-import { Icon } from '@/icons'
-import { showToast } from '@/common/toast'
-import { translateError } from '@/common/utils/translate-error'
-import { type ApiError, safeAwait } from '@/services/api'
-import { uploadWidgetMediaApi } from '@/services/widgets/widget-media.hook'
-import { callEvent } from '@/common/utils/call-event'
-import { GalleryPickerModal } from '@/components/gallery'
-import { PopoverMenuItem, Spinner, VipBadge } from '@/components/ui'
-import type { GalleryAsset } from '@/services/gallery/get-gallery-assets.hook'
 import { PhotoEmptyState } from './components/photo-empty-state'
 import { getPhotoFileError } from './utils/get-photo-file-error'
-import { t } from '@/common/i18n'
 
 interface PhotoWidgetProps {
 	size?: WidgetSize
@@ -32,7 +32,8 @@ export function PhotoWidget({
 	instanceId,
 }: PhotoWidgetProps) {
 	const { updateWidgetSettings } = useFreeWidgets()
-	const { isVip } = useAuth()
+	const { isAuthenticated } = useAuth()
+
 	const { blurMode } = useGeneralSetting()
 	const inputRef = useRef<HTMLInputElement>(null)
 
@@ -50,12 +51,6 @@ export function PhotoWidget({
 		e.target.value = ''
 		if (!file) return
 
-		if (!isVip) {
-			Analytics.event('photo_upload_vip_required')
-			callEvent('openSettings', 'vip')
-			return
-		}
-
 		const fileError = getPhotoFileError(file)
 		if (fileError) {
 			showToast(fileError, 'error')
@@ -66,7 +61,9 @@ export function PhotoWidget({
 
 		setIsUploading(true)
 		const [err, res] = await safeAwait<ApiError, { url: string }>(
-			uploadWidgetMediaApi(instanceId, file)
+			isAuthenticated
+				? uploadWidgetMediaApi(instanceId, file)
+				: readFileDataUrl(file).then((url) => ({ url }))
 		)
 		setIsUploading(false)
 
@@ -76,15 +73,12 @@ export function PhotoWidget({
 			return
 		}
 
+		Analytics.event('photo_uploaded')
 		updateWidgetSettings(instanceId, { imageSrc: res.url, isCustom: true })
 	}
 
 	const handleSelectFromSystem = () => {
-		if (!isVip) {
-			Analytics.event('photo_upload_vip_required')
-			callEvent('openSettings', 'vip')
-			return
-		}
+		Analytics.event('photo_upload_opened')
 		inputRef.current?.click()
 	}
 
@@ -119,7 +113,6 @@ export function PhotoWidget({
 			<PopoverMenuItem
 				icon={<Icon name="uploadImage" size={14} />}
 				label={t('widgets.photo.fromDevice')}
-				badge={!isVip ? <VipBadge size="xs" text={t('ui.vip.pro')} /> : undefined}
 				onClick={handleSelectFromSystem}
 				disabled={isUploading}
 			/>
@@ -169,7 +162,6 @@ export function PhotoWidget({
 					<PhotoEmptyState
 						size={size}
 						hasFailed={hasFailed}
-						isVip={isVip}
 						onPickFromDevice={handleSelectFromSystem}
 						onOpenGallery={handleOpenGallery}
 					/>

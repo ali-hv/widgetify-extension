@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Analytics from '@/analytics'
 import { t } from '@/common/i18n'
 import { getFromStorage, setToStorage } from '@/common/storage'
 import { callEvent } from '@/common/utils/call-event'
 import { TextInput } from '@/components/ui'
 import { useAuth } from '@/context/auth.context'
+import { useFreeWidgets } from '@/features/widgets/widgets.context'
 import { Icon } from '@/icons'
+import { useGetMarketItems } from '@/services/market/get-market-items.hook'
 import { useGetUserInventory } from '@/services/market/get-user-inventory.hook'
 import { MarketItemType } from '@/services/market/market.interface'
-import { useFreeWidgets } from '@/features/widgets/widgets.context'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PetOptionTile } from './components/pet-option-tile'
 import { PetPreview } from './components/pet-preview'
 import {
@@ -23,15 +24,6 @@ import {
 import { type PetBackground, type PetBackgroundId, type PetMeta, PetTypes } from './types'
 import { getPetBackground } from './utils/get-pet-background'
 import { resolvePetSettings } from './utils/resolve-pet-settings'
-
-const FREE_PETS = new Set<PetTypes>([
-	PetTypes.DOG,
-	PetTypes.CAT,
-	PetTypes.CHICKEN,
-	PetTypes.CRAB,
-	PetTypes.FROG,
-])
-const FREE_BACKGROUNDS = new Set<string>(['none', 'forest', 'autumn', 'beach'])
 
 const PET_NAME_MAX_LENGTH = 20
 
@@ -55,6 +47,11 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 		type: PET_ITEM_TYPES,
 	})
 
+	const { data: catalog } = useGetMarketItems(true, {
+		type: MarketItemType.PET_BACKGROUND,
+		limit: 100,
+	})
+	const allPets = Object.values(PetTypes)
 	const targetWidget = instanceId
 		? runtimeLayout.find((w) => w.instanceId === instanceId)
 		: null
@@ -66,60 +63,31 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 		targetMeta?.background || DEFAULT_PET_BACKGROUND
 	)
 
-	const ownedPets = new Set<string>(inventory?.pets?.map((p) => p.value) || [])
-	const ownedBackgrounds = new Set<string>(
-		inventory?.pet_backgrounds?.map((b) => b.value) || []
-	)
-
-	const allPets: PetTypes[] = useMemo(() => {
-		const list: PetTypes[] = Array.from(FREE_PETS)
-		const seen = new Set<string>(FREE_PETS)
-
-		if (inventory?.pets) {
-			for (const item of inventory.pets) {
-				const val = item.value as PetTypes
-				if (val && !seen.has(val) && Object.values(PetTypes).includes(val)) {
-					list.push(val)
-					seen.add(val)
-				}
-			}
-		}
-
-		return list
-	}, [inventory?.pets])
-
 	const allBackgrounds: PetBackground[] = useMemo(() => {
 		const map = new Map<string, PetBackground>()
 		for (const bg of PET_BACKGROUND_LIST) {
 			map.set(bg.id, bg)
 		}
-
-		if (inventory?.pet_backgrounds) {
-			for (const item of inventory.pet_backgrounds) {
-				const key = item.value
-				if (!map.has(key)) {
-					map.set(key, {
-						id: key,
-						label: item.name || key,
-						image: item.imageUrl || item.previewUrl || null,
-						groundOffsetPx: Number(item.meta?.groundOffsetPx ?? 0),
-					})
-				}
+		for (const item of [
+			...(inventory?.pet_backgrounds ?? []),
+			...(catalog?.items ?? []).map((item) => ({
+				...item,
+				value: item.itemValue ?? '',
+			})),
+		]) {
+			const key = item.value
+			if (key && !map.has(key)) {
+				map.set(key, {
+					id: key,
+					label: item.name || key,
+					image: item.imageUrl || item.previewUrl || null,
+					groundOffsetPx: Number(item.meta?.groundOffsetPx ?? 0),
+				})
 			}
 		}
 
 		return Array.from(map.values())
-	}, [inventory?.pet_backgrounds])
-
-	const isPetLocked = (type: PetTypes) => {
-		if (FREE_PETS.has(type)) return false
-		return !ownedPets.has(type)
-	}
-
-	const isBackgroundLocked = (bgId: PetBackgroundId) => {
-		if (FREE_BACKGROUNDS.has(bgId)) return false
-		return !ownedBackgrounds.has(bgId)
-	}
+	}, [inventory?.pet_backgrounds, catalog?.items])
 
 	useEffect(() => {
 		let cancelled = false
@@ -181,6 +149,7 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 			...persisted,
 			petType: type,
 			background: changes.background ?? persisted.background,
+			backgroundMeta: changes.backgroundMeta ?? persisted.backgroundMeta,
 			petOptions: changes.petName
 				? {
 						...persisted.petOptions,
@@ -212,12 +181,6 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 	)
 
 	async function onChangePetType(value: PetTypes) {
-		if (isPetLocked(value)) {
-			Analytics.event('pet_market_opened')
-			callEvent('openMarketModal', { filter: MarketItemType.PET })
-			return
-		}
-
 		const stored = await getFromStorage('pets')
 		const fallbackName =
 			stored?.petOptions?.[value]?.name ?? BASE_PET_OPTIONS.petOptions[value].name
@@ -237,12 +200,6 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 	}
 
 	async function onChangeBackground(value: PetBackgroundId) {
-		if (isBackgroundLocked(value)) {
-			Analytics.event('pet_background_market_opened')
-			callEvent('openMarketModal', { filter: MarketItemType.PET })
-			return
-		}
-
 		setBackground(value)
 
 		const selectedBg = allBackgrounds.find((b) => b.id === value)
@@ -345,7 +302,6 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 								key={type}
 								label={PET_SPECIES_LABEL[type]}
 								selected={petType === type}
-								locked={isPetLocked(type)}
 								onSelect={() => onChangePetType(type)}
 							>
 								<span className="flex items-end justify-center h-11">
@@ -384,7 +340,6 @@ export function PetSettings({ instanceId }: PetSettingsProps = {}) {
 								key={item.id}
 								label={item.label}
 								selected={background === item.id}
-								locked={isBackgroundLocked(item.id)}
 								onSelect={() => onChangeBackground(item.id)}
 							>
 								<span

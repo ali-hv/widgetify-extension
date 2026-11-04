@@ -1,6 +1,6 @@
 import { t } from '@/common/i18n'
 import type { Wallpaper } from '@/common/types/wallpaper.interface'
-import { Spinner, Tile, Tooltip, VipBadge } from '@/components/ui'
+import { Spinner, Tile, Tooltip } from '@/components/ui'
 import { Icon } from '@/icons'
 import { MediaPreview } from '../media-preview'
 
@@ -21,7 +21,6 @@ export function UploadActive({
 	onFileSelect,
 	onRemove,
 }: UploadActiveProps) {
-	const isCloudWallpaper = Boolean(customWallpaper.src?.startsWith('http'))
 	const caption =
 		customWallpaper.type === 'IMAGE'
 			? t('setting.wallpaperUpload.customPhoto')
@@ -42,7 +41,6 @@ export function UploadActive({
 						<Icon name="edit" size={12} />
 					)}
 					{caption}
-					{isCloudWallpaper && <VipBadge variant="solid" iconOnly size="xs" />}
 				</span>
 			}
 			actions={

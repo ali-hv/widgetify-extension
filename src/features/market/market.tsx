@@ -1,25 +1,24 @@
-import { t } from '@/common/i18n'
-import { useEffect, useRef, useState } from 'react'
 import Analytics from '@/analytics'
+import { t } from '@/common/i18n'
 import { listenEvent } from '@/common/utils/call-event'
 import { cn } from '@/common/utils/cn'
 import { useGetWallpaperCategories } from '@/services/wallpapers/get-wallpaper-categories.hook'
+import { useEffect, useRef, useState } from 'react'
 import { CategoryView } from './components/category-view'
 import { ItemDetail } from './components/store-item/item-detail'
 import { StoreNav } from './components/store-nav'
 import { useStoreItems } from './hooks/use-store-items'
-import { MarketCoins } from './market-coins/market-coins'
 import { MarketWallpaper } from './market-wallpaper/market-wallpaper'
 import { StoreTryOnProvider } from './store-try-on.context'
 import { Storefront } from './storefront/storefront'
 import type { StoreItem, StoreView } from './types'
 import { toStoreTarget } from './utils/store-item'
 
-export { StoreItemPicker } from './components/store-item-picker'
-export { bundledItemName } from './constants'
 export { ThemePreview } from './components/previews/theme-preview'
-export type { StoreItem } from './types'
+export { StoreItemPicker } from './components/store-item-picker'
 export { WallpaperPicker } from './components/wallpaper-picker'
+export { bundledItemName } from './constants'
+export type { StoreItem } from './types'
 
 interface MarketContainerProps {
 	initialTab?: string
@@ -96,7 +95,6 @@ export function MarketContainer({
 								onNavigate={navigate}
 							/>
 						)}
-						{view === 'wallet' && <MarketCoins />}
 						{view === 'WALLPAPER' && (
 							<MarketWallpaper
 								selectedId={selectedId}
@@ -127,7 +125,6 @@ export function MarketContainer({
 									key={detailItem.id}
 									item={detailItem}
 									onClose={() => setDetail(null)}
-									onSeeAllPackages={() => navigate('wallet')}
 								/>
 							</div>
 						</aside>

@@ -7,7 +7,7 @@ The canvas that hosts every widget, and the widgets themselves. Each widget is a
 - `widgets.tsx` is the canvas and `widgets.context.tsx` its state.
 - `registry.tsx` registers every widget. It is the one root file beyond the usual list: it hosts sub features, and it cannot live in `constants.ts` without every widget importing a file that imports every widget.
 - `types.ts`, `constants.ts`, `date.context.tsx`, `currency.context.tsx` hold what several widgets share.
-- `components/`, `hooks/` and `utils/` hold the platform: the container, the layout engine, migration, the VIP resolver, `WidgetError`, `WidgetEmpty`, `WidgetCompactEmpty`, `CompactPager` and `BoardSummary`.
+- `components/`, `hooks/` and `utils/` hold the platform: the container, the layout engine, migration, the catalog metadata, `WidgetError`, `WidgetEmpty`, `WidgetCompactEmpty`, `CompactPager` and `BoardSummary`.
 - Each widget is a sub feature with a `<name>.widget.tsx` entry: `bookmark`, `calendar`, `clock`, `combo-widget`, `dot-calendar`, `google-calendar`, `habit`, `mood-tracker`, `network`, `news`, `notes`, `partner-widget`, `pet`, `photo`, `search`, `todos`, `tools`, `transparent-clock`, `weather`, `wigi-arz`, `yadkar`.
 - The canvas's own sub features take the plain `<name>.tsx`: `catalog/` (adding a widget), `widget-settings/`, `presets/`.
 
@@ -34,7 +34,7 @@ Keyboard focus means `data-keyboard-focus` on the frame, set by `hooks/use-keybo
 - A header that shows when its data last arrived uses `formatUpdatedAt(dataUpdatedAt)` from `utils/updated-at.ts` as its info ("به‌روز ۱۴:۳۰").
 - A widget drawn inside another (wigi-arz and news inside combo-widget) takes the host's tabs as its header title and never calls `useWidgetSettingsSummary` or `useWidgetMenuActions`: those belong to the host.
 - A 4x3 board (tasks, notes, habits) splits its body in two with `gap-3` and a `border-s border-line ps-3.5` divider before the second pane. Tasks and habits put `BoardSummary` there (a percent ring and a few counts); notes put the open note.
-- A 2x6 panel (tasks, notes, habits, yadkar; PRO like the boards) is the same board stacked, drawn by the board's own component with `layout="panel"`. What sits beside the list on the board sits above it (`BoardSummary` with `placement="top"`, a `border-b pb-3` divider) or below it (the open note, a `border-t pt-3` divider). The panel is as wide as a 2x3, 184 to 270px of content depending on the canvas, so its header is the 2x3's. Its 6 rows match the default layout's height, so a panel runs the full height of a default board.
+- A 2x6 panel (tasks, notes, habits, yadkar) is the same board stacked, drawn by the board's own component with `layout="panel"`. What sits beside the list on the board sits above it (`BoardSummary` with `placement="top"`, a `border-b pb-3` divider) or below it (the open note, a `border-t pt-3` divider). The panel is as wide as a 2x3, 184 to 270px of content depending on the canvas, so its header is the 2x3's. Its 6 rows match the default layout's height, so a panel runs the full height of a default board.
 - A one-row list widget (tasks, habits 2x1) shows one item at a time and steps with `CompactPager`, the up and down pair at the row's end. The row's second line ends in "۲ از ۵". `CompactPager` only draws the buttons. Which item is showing is kept by `hooks/use-compact-pager-state.ts`: it holds the current id and, when the caller passes a `storageKey`, saves it under `compactPager:<storageKey>` and restores it on mount. Without a `storageKey` nothing is stored. A saved id that is no longer in the list (checked once the list is `isReady`) is dropped from state and from storage, and the caller's own fallback applies; a saved id is read through `normalizePagerId`.
 - `WidgetBackButton` leads a sub-view's header (an open note, the pomodoro leaderboard). `PopoverMenuItem` takes a `description` for a second line, such as a setting's current value.
 
@@ -59,7 +59,7 @@ A notification (the navbar card or the home dialog) can open the modal on one wi
 
 ## Rules
 
-- Each widget owns a `README.md` at its root, written for someone about to change it: files, runtime model, data and storage keys, settings, states, paid tiers, invariants, design decisions, open questions. `pet/README.md` is the model. When you finish work on a widget, rewrite its README from the code you just read. `docs.test.ts` fails when a README names a file that is gone.
+- Each widget owns a `README.md` at its root, written for someone about to change it: files, runtime model, data and storage keys, settings, states, access requirements, invariants, design decisions, open questions. `pet/README.md` is the model. When you finish work on a widget, rewrite its README from the code you just read. `docs.test.ts` fails when a README names a file that is gone.
 - **Never animate a container-query sized element.** Widgets size themselves in `cqh` and `cqw` (`w-[22cqh]`, `text-[13cqh]`). `transition-all` on one of those restarts a transition on width, height, padding and font size at every resize, and the browser re-lays out the subtree each frame. Use `transition-ui`, or name the one property (`transition-[stroke-dashoffset]`). `design-system.test.ts` rejects `transition-all`.
 - **`containerType: 'size'` on a widget container is load bearing.** Removing it collapses type and spacing, because `cqh` and `cqw` resolve against that container.
 - **Loading, error, empty and signed out are four different screens.** Draw the error with `WidgetError` (the widget's own sentence and a retry; `compact` for a small cell) and the empty state with `WidgetEmpty` (icon, title, description, at most one action), or `WidgetCompactEmpty` in a one-row cell (icon, two lines, at most one button). A file named `*-empty.tsx` or `*-error.tsx` that draws its own markup fails the design test.
@@ -68,7 +68,7 @@ A notification (the navbar card or the home dialog) can open the modal on one wi
 - Prefer per-source errors where a widget has several: one dead RSS feed must not blank the other two. Never show an error over data you already have; a slightly stale price beats an error message.
 - **Anything read back from storage is untrusted.** Put a `normalize-*` helper in the feature's `utils/`, give it a test, and route every read through it. `yadkar`, `tools`, `combo-widget`, `transparent-clock` and `notes` have one; copy the nearest.
 - **A setting needs a writer and a reader.** If you find one with only a half, say so and ask.
-- **Premium gating has two independent paths.** `allowedSizes[].isVipOnly` locks a widget already on the canvas. The add and edit modal checks the variant's flag and skips the size check for any widget that declares variants. A widget with both variants and a premium size needs `isVipOnly` in both places. They are not duplicates.
+- All widget sizes, variants, duplicates and presets are free. The catalog reads new marks and featured ordering from the server, and ignores legacy subscription metadata and free-widget limits. Canvas geometry and each widget's `canDuplicate` rule still apply. Partner widgets still require sign-in, contact details and consent when their integration needs them.
 - Storage keys, widget ids and analytics names are data. Never rename the strings.
 
 ## Design decisions (do not "fix")
@@ -82,7 +82,7 @@ A notification (the navbar card or the home dialog) can open the modal on one wi
 - A press that starts and ends on empty space leaves edit mode. Empty space is the canvas background or any element that contains the canvas, so the page around the grid counts, and a modal, the toolbar or a widget never does. A right click does not count; it opens the canvas menu.
 - The edit grid takes its colour from the wallpaper through `hooks/use-wallpaper-theme.ts`, the analysis the transparent clock uses. The theme's `line` and `fill` vanished on a wallpaper of the other lightness, such as a dark wallpaper under the light theme. The hook keeps its last result between mounts, so after the first time the grid opens in the right colour.
 - The catalog preview draws a widget at its real size and scales it into the preview, so the box that holds it takes the scaled size (`catalog/components/preview.tsx`). The widget sat in a flex item with `overflow-hidden`, whose minimum height is 0, so a tall widget shrank to the preview area before the scale: a 2x4 rendered at 342px instead of 408 and a 2x6 at 342px instead of 616, measured in the catalog's own flex layout. The new box draws both at full height, and a 2x3 comes out the same as before.
-- «مدیریت ویجت‌ها» in settings opens the catalog over the settings modal, the way the store opens from the appearance tab (`returnToSettings` on `openAddCustomWidgetModal`, `returnsToSettings` on `AddWidgetModal`). Closing the catalog shows the settings modal again, so the catalog has no back button of its own. An upgrade button in the catalog closes it too: the settings modal underneath switches to its pro tab, and you would not see that under the catalog.
+- «مدیریت ویجت‌ها» in settings opens the catalog over the settings modal, the way the store opens from the appearance tab. Closing the catalog shows the settings modal again, so the catalog has no back button of its own.
 
 ## Adding a widget
 
@@ -97,7 +97,7 @@ A notification (the navbar card or the home dialog) can open the modal on one wi
 - `transition-all` was found on `cq*` sized elements in eleven widgets and made drags stall.
 - A failed request drew the empty state, so a network problem read as "you have no tasks".
 - A disabled query left a signed out user on a skeleton that never resolved.
-- Notes had a premium model that could be picked for free and then rendered locked, because `isVipOnly` was missing on the variant.
+- Notes once had inconsistent subscription checks between the catalog and canvas. Subscription checks have since been removed from both.
 
 ## Known and not fixed
 

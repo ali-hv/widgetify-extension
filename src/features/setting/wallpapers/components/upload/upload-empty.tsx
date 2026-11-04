@@ -1,16 +1,14 @@
 import { t } from '@/common/i18n'
-import { callEvent } from '@/common/utils/call-event'
 import { cn } from '@/common/utils/cn'
-import { Spinner, Tooltip } from '@/components/ui'
+import { Spinner } from '@/components/ui'
 import { Icon } from '@/icons'
-import { ProTooltipContent } from './pro-tooltip'
 
 interface UploadEmptyProps {
 	isDragging: boolean
 	isUploading: boolean
-	isVip: boolean
-	vipMaxSize: number
-	freeMaxSize: number
+
+	maxSize: number
+
 	onFileSelect: () => void
 	onDragOver: (e: React.DragEvent) => void
 	onDragLeave: (e: React.DragEvent) => void
@@ -20,9 +18,9 @@ interface UploadEmptyProps {
 export function UploadEmpty({
 	isDragging,
 	isUploading,
-	isVip,
-	vipMaxSize,
-	freeMaxSize,
+
+	maxSize,
+
 	onFileSelect,
 	onDragOver,
 	onDragLeave,
@@ -55,37 +53,14 @@ export function UploadEmpty({
 						? t('setting.wallpaperUpload.dropHere')
 						: isUploading
 							? t('setting.wallpaperUpload.uploading')
-							: isVip
-								? t('setting.wallpaperUpload.customMediaTitle')
-								: t('setting.wallpaperUpload.customPhoto')}
+							: t('setting.wallpaperUpload.customMediaTitle')}
 				</span>
 				<span className="text-3xs text-fg-faint">
-					{isVip
-						? t('setting.wallpaperUpload.sizeLimitHint', {
-								p0: vipMaxSize,
-							})
-						: t('setting.wallpaperUpload.localSizeHint', {
-								p0: freeMaxSize,
-							})}
+					{t('setting.wallpaperUpload.sizeLimitHint', {
+						p0: maxSize,
+					})}
 				</span>
 			</button>
-
-			{!isVip && (
-				<Tooltip
-					content={<ProTooltipContent vipMaxSize={vipMaxSize} />}
-					position="top"
-					className="absolute top-2 end-2"
-				>
-					<button
-						type="button"
-						onClick={() => callEvent('openSettings', 'vip')}
-						className="inline-flex items-center h-6 gap-1 px-2 font-bold border rounded-lg cursor-pointer text-3xs text-vip bg-vip-fill border-vip-fill-2 hover:bg-vip-fill-2 transition-ui focus-visible:focus-ring"
-					>
-						<Icon name="diamond" size={12} />
-						{t('setting.wallpaperUpload.videoRequiresProBadge')}
-					</button>
-				</Tooltip>
-			)}
 		</div>
 	)
 }

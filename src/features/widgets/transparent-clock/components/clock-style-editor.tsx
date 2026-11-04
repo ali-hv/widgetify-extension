@@ -1,5 +1,3 @@
-import type React from 'react'
-import { useEffect, useLayoutEffect, useState } from 'react'
 import { t } from '@/common/i18n'
 import { Presence, Motion as motion } from '@/common/motion'
 import { cn } from '@/common/utils/cn'
@@ -10,8 +8,9 @@ import {
 	Slider,
 	TabNavigation,
 	Tooltip,
-	VipBadge,
 } from '@/components/ui'
+import type React from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useWallpaperTheme } from '../../hooks/use-wallpaper-theme'
 import {
 	CLOCK_COLOR_PRESETS,
@@ -49,8 +48,7 @@ interface ClockStyleEditorProps {
 	onChange: (next: Partial<TransparentClockStyle>) => void
 	onSave: () => void
 	onCancel: () => void
-	isVip: boolean
-	onUpgrade: () => void
+
 	canStack: boolean
 }
 
@@ -62,18 +60,15 @@ export function ClockStyleEditor({
 	onChange,
 	onSave,
 	onCancel,
-	isVip,
-	onUpgrade,
+
 	canStack,
 }: ClockStyleEditorProps) {
 	const [tab, setTab] = useState<EditorTab>('style')
 	const spotlight = useAnchorRect(anchorRef, isOpen)
-	const proIcon = isVip ? undefined : <VipBadge size="xs" iconOnly />
-	const isLocked = !isVip && tab !== 'shape'
 
 	useEffect(() => {
-		if (isOpen) setTab(isVip ? 'style' : 'shape')
-	}, [isOpen, isVip])
+		if (isOpen) setTab('style')
+	}, [isOpen])
 
 	useEffect(() => {
 		if (!isOpen) return
@@ -139,7 +134,6 @@ export function ClockStyleEditor({
 									{
 										id: 'style',
 										label: t('widgets.transparentClock.tab.style'),
-										icon: proIcon,
 									},
 									{
 										id: 'shape',
@@ -148,7 +142,6 @@ export function ClockStyleEditor({
 									{
 										id: 'color',
 										label: t('widgets.transparentClock.tab.color'),
-										icon: proIcon,
 									},
 								]}
 							/>
@@ -164,13 +157,7 @@ export function ClockStyleEditor({
 						</div>
 
 						<div className="relative flex items-center justify-center min-h-20">
-							<div
-								inert={isLocked ? true : undefined}
-								className={cn(
-									'flex items-center justify-center w-full',
-									isLocked && 'opacity-40 pointer-events-none'
-								)}
-							>
+							<div className="flex items-center justify-center w-full">
 								{tab === 'style' && (
 									<StyleTab
 										clockStyle={clockStyle}
@@ -192,24 +179,6 @@ export function ClockStyleEditor({
 									/>
 								)}
 							</div>
-							{isLocked && (
-								<div className="absolute inset-0 flex items-center justify-center">
-									<div className="flex items-center gap-3 px-3 py-2 border shadow-md rounded-xl bg-glass-surface-2 border-line">
-										<span className="text-xs font-medium text-fg">
-											{t('widgets.transparentClock.proOnly')}
-										</span>
-										<Button
-											size="sm"
-											variant="solid"
-											color="vip"
-											rounded="xl"
-											onClick={onUpgrade}
-										>
-											{t('widgets.transparentClock.upgrade')}
-										</Button>
-									</div>
-								</div>
-							)}
 						</div>
 					</motion.div>
 				)}

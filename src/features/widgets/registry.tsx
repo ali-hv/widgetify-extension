@@ -1,47 +1,47 @@
 import { BookmarkProvider } from '@/features/widgets/bookmark/bookmark.context'
 import { BookmarksList } from '@/features/widgets/bookmark/bookmark.widget'
-import { SearchLayout } from '@/features/widgets/search/search.widget'
 import CalendarLayout from '@/features/widgets/calendar/calendar.widget'
 import { ComboWidget } from '@/features/widgets/combo-widget/combo-widget.widget'
+import { CurrencyProvider } from '@/features/widgets/currency.context'
+import { DateProvider } from '@/features/widgets/date.context'
+import { HabitsLayout } from '@/features/widgets/habit/habit.widget'
 import { NetworkLayout } from '@/features/widgets/network/network.widget'
 import { NewsLayout } from '@/features/widgets/news/news.widget'
+import { SearchLayout } from '@/features/widgets/search/search.widget'
 import { ToolsLayout } from '@/features/widgets/tools/tools.widget'
+import { WidgetTabKeys } from '@/features/widgets/types'
 import { WeatherLayout } from '@/features/widgets/weather/weather.widget'
 import { WigiArzLayout } from '@/features/widgets/wigi-arz/wigi-arz.widget'
 import { YadkarWidget } from '@/features/widgets/yadkar/yadkar.widget'
-import { HabitsLayout } from '@/features/widgets/habit/habit.widget'
-import { CurrencyProvider } from '@/features/widgets/currency.context'
-import { DateProvider } from '@/features/widgets/date.context'
+import { useSyncExternalStore } from 'react'
 import { ClockWidget } from './clock/clock.widget'
-import { PetWidget } from './pet/pet.widget'
-import { TransparentClockWidget } from './transparent-clock/transparent-clock.widget'
-import { MoodTrackerWidget } from './mood-tracker/mood-tracker.widget'
-import { PhotoWidget } from './photo/photo.widget'
+import { PartnerPreview } from './components/partner-preview'
+import { WidgetContainer } from './components/widget-container'
+import { WidgetUnavailableTile } from './components/widget-unavailable'
 import {
 	DotCalendarWidget,
 	normalizeDotCalendarMeta,
 } from './dot-calendar/dot-calendar.widget'
 import { GoogleCalendarWidget } from './google-calendar/google-calendar.widget'
-import { TodosLayout } from './todos/todos.widget'
+import { MoodTrackerWidget } from './mood-tracker/mood-tracker.widget'
 import { NotesLayout, resolveNotesVariant } from './notes/notes.widget'
-import { WidgetContainer } from './components/widget-container'
-import { WidgetTabKeys } from '@/features/widgets/types'
-import { TodoistWidget } from './todoist/todoist.widget'
-import { useSyncExternalStore } from 'react'
 import { PartnerWidget } from './partner-widget/partner-widget.widget'
-import { PartnerPreview } from './components/partner-preview'
-import { WidgetUnavailableTile } from './components/widget-unavailable'
+import { PetWidget } from './pet/pet.widget'
+import { PhotoWidget } from './photo/photo.widget'
+import { TodoistWidget } from './todoist/todoist.widget'
+import { TodosLayout } from './todos/todos.widget'
+import { TransparentClockWidget } from './transparent-clock/transparent-clock.widget'
+import {
+	type StoredWidget,
+	type WidgetDefinition,
+	WidgetKeys,
+} from './utils/layout-engine/types'
 import { partnerCatalogStore } from './utils/partner-catalog/partner-catalog-store'
 import {
 	type PartnerNodes,
 	buildWidgetRegistry,
 	unavailableDefinition,
 } from './utils/partner-catalog/partner-definitions'
-import {
-	type StoredWidget,
-	type WidgetDefinition,
-	WidgetKeys,
-} from './utils/layout-engine/types'
 
 const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 	[WidgetKeys.search]: {
@@ -52,7 +52,7 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		icon: 'search',
 		category: 'productivity',
 		allowedSizes: [
-			{ w: 2, h: 1, isVipOnly: true },
+			{ w: 2, h: 1 },
 			{ w: 4, h: 1 },
 		],
 		defaultSize: { w: 4, h: 1 },
@@ -125,7 +125,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 
 				size: { w: 2, h: 1 },
 				meta: { variant: 'flip' },
-				isVipOnly: true,
 			},
 			{
 				id: 'digital-vertical',
@@ -140,7 +139,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 
 				size: { w: 1, h: 1 },
 				meta: { variant: 'analog' },
-				isVipOnly: true,
 			},
 		],
 		canDuplicate: false,
@@ -157,8 +155,8 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		canToggle: true,
 		popular: true,
 		allowedSizes: [
-			{ w: 1, h: 1, isVipOnly: false },
-			{ w: 2, h: 1, isVipOnly: true },
+			{ w: 1, h: 1 },
+			{ w: 2, h: 1 },
 			{ w: 2, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
@@ -206,7 +204,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 				label: 'widgets.registry.variant.googleCalendar.agenda',
 
 				size: { w: 2, h: 3 },
-				isVipOnly: true,
 				meta: { variant: 'agenda' },
 			},
 			{
@@ -214,7 +211,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 				label: 'widgets.registry.variant.googleCalendar.compact-2x1',
 
 				size: { w: 2, h: 1 },
-				isVipOnly: true,
 				meta: { variant: 'compact-2x1' },
 			},
 			{
@@ -222,7 +218,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 				label: 'widgets.registry.variant.googleCalendar.compact-1x1',
 
 				size: { w: 1, h: 1 },
-				isVipOnly: true,
 				meta: { variant: 'compact-1x1' },
 			},
 		],
@@ -243,9 +238,9 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		order: 3,
 		canToggle: true,
 		allowedSizes: [
-			{ w: 1, h: 1, isVipOnly: true },
+			{ w: 1, h: 1 },
 			{ w: 2, h: 1 },
-			{ w: 2, h: 2, isVipOnly: true },
+			{ w: 2, h: 2 },
 			{ w: 2, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
@@ -291,8 +286,8 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		canToggle: true,
 		allowedSizes: [
 			{ w: 2, h: 3 },
-			{ w: 2, h: 6, isVipOnly: true },
-			{ w: 4, h: 3, isVipOnly: true },
+			{ w: 2, h: 6 },
+			{ w: 4, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
 		canDuplicate: false,
@@ -308,7 +303,7 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		order: 2,
 		canToggle: true,
 		allowedSizes: [
-			{ w: 2, h: 1, isVipOnly: true },
+			{ w: 2, h: 1 },
 			{ w: 2, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
@@ -328,7 +323,7 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		order: 5,
 		canToggle: true,
 		allowedSizes: [
-			{ w: 1, h: 1, isVipOnly: true },
+			{ w: 1, h: 1 },
 			{ w: 2, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
@@ -347,7 +342,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 
 				size: { w: 1, h: 1 },
 				meta: { currencyCode: 'USD', variant: 'compact' },
-				isVipOnly: true,
 			},
 		],
 		canDuplicate: true,
@@ -382,8 +376,8 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		order: 7,
 		canToggle: true,
 		allowedSizes: [
-			{ w: 1, h: 1, isVipOnly: true },
-			{ w: 2, h: 1, isVipOnly: true },
+			{ w: 1, h: 1 },
+			{ w: 2, h: 1 },
 			{ w: 2, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
@@ -403,8 +397,8 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		allowedSizes: [
 			{ w: 2, h: 1 },
 			{ w: 2, h: 3 },
-			{ w: 2, h: 6, isVipOnly: true },
-			{ w: 4, h: 3, isVipOnly: true },
+			{ w: 2, h: 6 },
+			{ w: 4, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
 		canDuplicate: false,
@@ -441,8 +435,8 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		allowedSizes: [
 			{ w: 2, h: 1 },
 			{ w: 2, h: 3 },
-			{ w: 2, h: 6, isVipOnly: true },
-			{ w: 4, h: 3, isVipOnly: true },
+			{ w: 2, h: 6 },
+			{ w: 4, h: 3 },
 		],
 		defaultSize: { w: 2, h: 3 },
 		canDuplicate: true,
@@ -463,9 +457,9 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		category: 'productivity',
 		allowedSizes: [
 			{ w: 2, h: 3 },
-			{ w: 2, h: 2, isVipOnly: true },
-			{ w: 4, h: 3, isVipOnly: true },
-			{ w: 2, h: 6, isVipOnly: true },
+			{ w: 2, h: 2 },
+			{ w: 4, h: 3 },
+			{ w: 2, h: 6 },
 		],
 		defaultSize: { w: 2, h: 3 },
 		variants: [
@@ -481,7 +475,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 				label: 'widgets.registry.variant.notes.sticky',
 
 				size: { w: 2, h: 2 },
-				isVipOnly: true,
 				meta: { variant: 'sticky' },
 			},
 			{
@@ -489,7 +482,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 				label: 'widgets.registry.variant.notes.board',
 
 				size: { w: 4, h: 3 },
-				isVipOnly: true,
 				meta: { variant: 'board' },
 			},
 			{
@@ -497,7 +489,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 				label: 'widgets.registry.variant.notes.panel',
 
 				size: { w: 2, h: 6 },
-				isVipOnly: true,
 				meta: { variant: 'panel' },
 			},
 		],
@@ -546,7 +537,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 			},
 		],
 		canDuplicate: false,
-		isVipOnly: false,
 		canResize: true,
 		node: (instanceId, size, meta) => (
 			<TransparentClockWidget instanceId={instanceId} size={size} meta={meta} />
@@ -561,7 +551,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		emoji: '🥰',
 		icon: 'mood',
 		category: 'lifestyle',
-		isVipOnly: false,
 		allowedSizes: [
 			{ w: 1, h: 1 },
 			{ w: 2, h: 1 },
@@ -577,9 +566,8 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 		emoji: '🖼️',
 		icon: 'image',
 		category: 'lifestyle',
-		isVipOnly: false,
 		allowedSizes: [
-			{ w: 1, h: 1, isVipOnly: true },
+			{ w: 1, h: 1 },
 			{ w: 2, h: 1 },
 			{ w: 2, h: 2 },
 			{ w: 2, h: 4 },
@@ -625,7 +613,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 
 				size: { w: 2, h: 2 },
 				meta: { variant: 'goal' },
-				isVipOnly: true,
 			},
 			{
 				id: 'goal-count',
@@ -633,7 +620,6 @@ const WIDGET_DEFINITIONS: Record<WidgetKeys, WidgetDefinition> = {
 
 				size: { w: 2, h: 1 },
 				meta: { variant: 'goal' },
-				isVipOnly: true,
 			},
 		],
 		canResize: true,

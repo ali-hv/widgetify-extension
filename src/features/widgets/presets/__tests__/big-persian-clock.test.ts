@@ -12,7 +12,6 @@ const find = (id: string) => placed().find((item) => item.id === id)
 describe('the big Persian clock preset', () => {
 	it('exists, is free, and is shown among the featured ones', () => {
 		expect(preset).toBeDefined()
-		expect(preset?.isVip).toBe(false)
 		expect(preset?.isFeatured).toBe(true)
 	})
 

@@ -1,20 +1,21 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { getFromStorage, removeFromStorage, setToStorage } from '@/common/storage'
-import { callEvent, listenEvent } from '@/common/utils/call-event'
-import type { StoredWallpaper, Wallpaper } from '@/common/types/wallpaper.interface'
+import Analytics from '@/analytics'
 import { DEFAULT_WALLPAPER } from '@/common/constants/default-wallpaper'
+import { t } from '@/common/i18n'
+import { getFromStorage, removeFromStorage, setToStorage } from '@/common/storage'
+import { showToast } from '@/common/toast'
+import type { StoredWallpaper, Wallpaper } from '@/common/types/wallpaper.interface'
+import { callEvent, listenEvent } from '@/common/utils/call-event'
+import { translateError } from '@/common/utils/translate-error'
+import { useAuth } from '@/context/auth.context'
 import { type ApiError, safeAwait } from '@/services/api'
 import { useChangeWallpaper } from '@/services/extension/update-setting.hook'
-import { translateError } from '@/common/utils/translate-error'
-import Analytics from '@/analytics'
-import { showToast } from '@/common/toast'
-import { t } from '@/common/i18n'
-import { useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '@/context/auth.context'
+import { createContext, useContext, useEffect, useState } from 'react'
+import {
+	canSyncWallpaperSelection,
+	wallpaperSelectionToStorage,
+} from './utils/wallpaper-sync'
 
 import { getRandomWallpaper } from '@/services/wallpapers/get-wallpaper-categories.hook'
-import { userKeys } from '@/services/user/user.keys'
-import { wallpapersKeys } from '@/services/wallpapers/wallpapers.keys'
 
 interface WallpaperContextValue {
 	selectedBackground: Wallpaper | null
@@ -30,7 +31,6 @@ interface WallpaperContextValue {
 const WallpaperContext = createContext<WallpaperContextValue | null>(null)
 
 export function WallpaperProvider({ children }: { children: React.ReactNode }) {
-	const queryClient = useQueryClient()
 	const { isAuthenticated } = useAuth()
 	const { mutateAsync } = useChangeWallpaper()
 
@@ -107,14 +107,7 @@ export function WallpaperProvider({ children }: { children: React.ReactNode }) {
 
 		if (selectedBackground.id.startsWith('preview-')) return
 
-		const wallpaperData: StoredWallpaper = {
-			id: selectedBackground.id,
-			type: selectedBackground.type,
-			src: selectedBackground.src,
-		}
-		if (selectedBackground.type === 'GRADIENT' && selectedBackground.gradient) {
-			wallpaperData.gradient = selectedBackground.gradient
-		}
+		const wallpaperData = wallpaperSelectionToStorage(selectedBackground)
 
 		setToStorage('wallpaper', wallpaperData)
 		if (selectedBackground.id === 'custom-wallpaper') {
@@ -135,11 +128,6 @@ export function WallpaperProvider({ children }: { children: React.ReactNode }) {
 		setCustomWallpaper(null)
 		removeFromStorage('customWallpaper')
 
-		if (wallpaper.coin && !isAuthenticated) {
-			showToast(t('context.wallpaper.loginRequired'), 'error')
-			return false
-		}
-
 		const previousWallpaper: Wallpaper =
 			selectedBackground ??
 			(currentStoredWallpaper
@@ -153,37 +141,20 @@ export function WallpaperProvider({ children }: { children: React.ReactNode }) {
 					}
 				: DEFAULT_WALLPAPER)
 
-		let isSet = false
-		if (!wallpaper.coin || wallpaper.isOwned) {
-			setSelectedBackground(wallpaper)
-			isSet = true
-		}
+		setSelectedBackground(wallpaper)
 
-		if (isAuthenticated) {
+		if (isAuthenticated && canSyncWallpaperSelection(wallpaper)) {
 			const wallpaperId =
 				wallpaper.type === 'GRADIENT' ? 'custom-wallpaper' : wallpaper.id
-			const [error, responseWallpaper] = await safeAwait<ApiError, Wallpaper>(
+			const [error] = await safeAwait<ApiError, Wallpaper>(
 				mutateAsync({ wallpaperId })
 			)
 
 			if (error) {
-				if (isSet) {
-					setSelectedBackground(previousWallpaper)
-				}
+				setSelectedBackground(previousWallpaper)
 				showToast(translateError(error) as string, 'error')
 				return false
 			}
-
-			if (wallpaper.coin && !wallpaper.isOwned) {
-				showToast(t('context.wallpaper.activated'), 'success')
-				queryClient.invalidateQueries({ queryKey: userKeys.profile })
-				queryClient.invalidateQueries({
-					queryKey: wallpapersKeys.all,
-					refetchType: 'all',
-				})
-			}
-
-			if (!isSet) setSelectedBackground(responseWallpaper)
 		}
 
 		Analytics.event('wallpaper_changed')

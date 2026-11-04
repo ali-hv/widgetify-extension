@@ -1,10 +1,9 @@
-import { useState, useRef } from 'react'
-import { Icon } from '@/icons'
-import { UserCoin } from '@/components/user-coin'
 import { t } from '@/common/i18n'
-import { useLazyLoad } from './use-lazy-load'
-import type { GalleryAsset } from '@/services/gallery/get-gallery-assets.hook'
 import { Spinner } from '@/components/ui'
+import { Icon } from '@/icons'
+import type { GalleryAsset } from '@/services/gallery/get-gallery-assets.hook'
+import { useRef, useState } from 'react'
+import { useLazyLoad } from './use-lazy-load'
 
 interface GalleryPhotoItemProps {
 	asset: GalleryAsset
@@ -74,35 +73,12 @@ export function GalleryPhotoItem({ asset, isSelected, onClick }: GalleryPhotoIte
 							{asset.title || ''}
 						</span>
 
-						{asset.price > 0 && !asset.isOwned ? (
-							<div className="origin-bottom-left scale-75">
-								<UserCoin
-									coins={asset.price}
-									title={t('gallery.photo.price')}
-								/>
-							</div>
-						) : null}
+						{null}
 					</div>
 
 					{isSelected && (
 						<div className="absolute p-1 text-on-brand rounded-full shadow-sm top-2 left-2 bg-brand">
 							<Icon name="check" size={12} />
-						</div>
-					)}
-
-					{asset.accessVip && !asset.isOwned && (
-						<div className="absolute top-1.5 left-1.5 z-10">
-							<span className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-vip-hover backdrop-blur-xs text-on-vip text-3xs font-bold shadow-sm border border-image-line">
-								<Icon name="diamond" size={10} />
-								<span>{t('gallery.photo.freeWithPro')}</span>
-							</span>
-						</div>
-					)}
-
-					{asset.isOwned && !isSelected && (
-						<div className="absolute flex gap-0.5 px-1.5 rounded-tl-2xl rounded-br-lg bg-success text-on-success shadow-sm items-center top-0 left-0 text-3xs h-4.5">
-							<Icon name="shoppingBag" size={10} />
-							<span>{t('gallery.photo.owned')}</span>
 						</div>
 					)}
 				</>

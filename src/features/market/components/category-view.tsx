@@ -1,23 +1,16 @@
 import { t } from '@/common/i18n'
+import { Button, EmptyState, TabNavigation } from '@/components/ui'
 import { useState } from 'react'
-import { Button, Chip, EmptyState, TabNavigation } from '@/components/ui'
 import { CATEGORY_COPY } from '../constants'
 import { useItemState } from '../hooks/use-item-state'
 import { useStoreItems } from '../hooks/use-store-items'
-import type { CategoryType, ItemState, StoreItem } from '../types'
-import { faNumber, sortByState } from '../utils/store-item'
+import type { CategoryType, StoreItem } from '../types'
+import { sortByState } from '../utils/store-item'
 import { CategoryHeader } from './category-header'
 import { StoreItemTile } from './store-item/store-item-tile'
 import { TileGrid, TileSkeletons } from './tile-grid'
 
-type Ownership = 'all' | 'buyable' | 'mine'
 type PetKind = 'PET' | 'PET_BACKGROUND'
-
-const OWNERSHIP_STATES: Record<Ownership, ItemState[]> = {
-	all: ['locked', 'free', 'owned', 'active'],
-	buyable: ['locked', 'free'],
-	mine: ['owned', 'active'],
-}
 
 const PET_KINDS: { id: PetKind; label: string }[] = [
 	{ id: 'PET', label: t('market.category.petsTab') },
@@ -39,31 +32,13 @@ export function CategoryView({
 }: CategoryViewProps) {
 	const { items, isLoading, isError, refetch } = useStoreItems()
 	const stateOf = useItemState()
-	const [ownership, setOwnership] = useState<Ownership>('all')
 	const [petKind, setPetKind] = useState<PetKind>(defaultPetKind)
 	const copy = CATEGORY_COPY[type]
 
 	const shownType = type === 'PET' ? petKind : type
 	const source = items.filter((item) => item.type === shownType)
-	const countOf = (filter: Ownership) =>
-		source.filter((item) => OWNERSHIP_STATES[filter].includes(stateOf(item))).length
-	const visible = sortByState(
-		source.filter((item) => OWNERSHIP_STATES[ownership].includes(stateOf(item))),
-		stateOf
-	)
 
-	const filterChip = (filter: Ownership, label: string) => (
-		<Chip
-			size="sm"
-			selected={ownership === filter}
-			onClick={() => setOwnership(filter)}
-		>
-			{label}
-			<span className="opacity-60 ms-1 tabular-nums">
-				{faNumber(countOf(filter))}
-			</span>
-		</Chip>
-	)
+	const visible = sortByState(source, stateOf)
 
 	return (
 		<>
@@ -79,9 +54,6 @@ export function CategoryView({
 							className="w-44 me-2"
 						/>
 					)}
-					{filterChip('all', t('market.category.allFilter'))}
-					{filterChip('buyable', t('market.category.buyableFilter'))}
-					{filterChip('mine', t('market.category.ownedFilter'))}
 				</div>
 			</CategoryHeader>
 
@@ -99,10 +71,7 @@ export function CategoryView({
 			) : isLoading ? (
 				<TileSkeletons count={6} wide={copy.wide} />
 			) : visible.length === 0 ? (
-				<EmptyCategory
-					ownership={ownership}
-					onShowAll={() => setOwnership('all')}
-				/>
+				<EmptyState icon="shoppingBag" title={t('market.category.emptyTitle')} />
 			) : (
 				<TileGrid wide={copy.wide}>
 					{visible.map((item) => (
@@ -117,37 +86,5 @@ export function CategoryView({
 				</TileGrid>
 			)}
 		</>
-	)
-}
-
-function EmptyCategory({
-	ownership,
-	onShowAll,
-}: {
-	ownership: Ownership
-	onShowAll: () => void
-}) {
-	if (ownership === 'all') {
-		return <EmptyState icon="shoppingBag" title={t('market.category.emptyTitle')} />
-	}
-	return (
-		<EmptyState
-			icon="shoppingBag"
-			title={
-				ownership === 'mine'
-					? t('market.category.emptyOwnedTitle')
-					: t('market.category.allOwnedTitle')
-			}
-			description={
-				ownership === 'mine'
-					? t('market.category.emptyOwnedHint')
-					: t('market.category.emptyBuyableHint')
-			}
-			action={
-				<Button size="sm" onClick={onShowAll}>
-					{t('market.category.showAll')}
-				</Button>
-			}
-		/>
 	)
 }

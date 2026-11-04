@@ -1,9 +1,9 @@
+import { t } from '@/common/i18n'
+import { fa } from '@/common/i18n/fa'
 import { describe, expect, it } from 'bun:test'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import ts from 'typescript'
-import { fa } from '@/common/i18n/fa'
-import { t } from '@/common/i18n'
 
 const PERSIAN = /[\u0600-\u06FF]/
 const ROOTS = ['src', 'entrypoints', 'background']
@@ -14,7 +14,7 @@ const ALLOWLIST: { path: string; reason: string }[] = [
 		reason: 'Hijri month-name table indexed by calendar code; locale data, not UI copy',
 	},
 	{
-		path: 'src/common/constants/config-keys.ts',
+		path: 'src/pages/home/constants.ts',
 		reason: 'ConfigKey.VERSION_NAME is a saved/compared value; display uses common.config.versionName',
 	},
 	{

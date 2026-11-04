@@ -4,7 +4,7 @@ Agent reference for `src/features/widgets/pet/`. Read this before changing anyth
 
 ## Summary
 
-A single sprite pet lives inside a fixed 2x1 widget cell. It follows a per-species state tree (walk to a wall, turn, walk back, sit, lie, run), chases and eats food the user drops with a click, and slowly gets hungry. Eight species: dog, cat, chicken, crab, frog, owl, sheep, hedgehog. Four built-in backgrounds: none, forest, autumn, beach. Dynamic backgrounds (like tehran) are uploaded via the admin panel and fetched from user inventory. Free tier, no server calls.
+A single sprite pet lives inside a fixed 2x1 widget cell. It follows a per-species state tree (walk to a wall, turn, walk back, sit, lie, run), chases and eats food the user drops with a click, and slowly gets hungry. Eight species: dog, cat, chicken, crab, frog, owl, sheep, hedgehog. Four built-in backgrounds: none, forest, autumn, beach. Dynamic backgrounds (like tehran) come from the market catalog and existing user inventory. All eight built-in species and the available backgrounds are free. The catalog and inventory still use the Widgetify backend.
 
 ## File map
 
@@ -14,7 +14,7 @@ A single sprite pet lives inside a fixed 2x1 widget cell. It follows a per-speci
 | `pet.context.tsx` | `PetProvider`: holds the persisted global settings, unsaved live edits and the widget `meta`, resolves them with `resolvePetSettings`, owns hunger and its persistence, listens to `updatedPetSettings`. |
 | `pet-setting.tsx` | Settings panel in two modes (see Persistence). Two columns from 768 px up, stacked below: a preview, the name with a counter (`maxLength` 20) and three tips; then the species grid ending in a «حیوان خانگی بیشتر» tile and the scene grid ending in a «محیط‌های بیشتر» tile, both of which open the shop. Also the only writer of global choices. |
 | `components/pet-preview.tsx` | The still preview in the panel: the scene at the widget's 8:3 shape, the species' preview clip and its name bubble. |
-| `components/pet-option-tile.tsx` | One tile in the species or scene grid, with a lock badge when it is not owned. |
+| `components/pet-option-tile.tsx` | One tile in the species or scene grid, without ownership checks. |
 | `types.ts` | `PetTypes`, `PetState`, `PetSequence`, `PetDimensions`, `PetFlight`, `PetHop`, `PetAnimations`, `PetSpeed`, background types, storage and event augmentation. |
 | `constants.ts` | Icons and previews per species, Persian labels, `PET_BACKGROUNDS`, default names, hunger constants. |
 | `hooks/use-base-pet-logic.ts` | Composes the four hooks below and owns the state machine: `enterState`, `tick`, the hover name. Returns `animationSrc`, `airborne`, `direction`, `showName`, `collectibles`. |
@@ -174,7 +174,7 @@ Rules worth knowing:
 - The settings panel saves through one function that reads the latest values, and changing species cancels a pending name save; otherwise a stale name or species would be written back.
 - Switching species sets the name to that species' stored or default name. The widget keeps one name, for the active species.
 - Both places that render a widget must pass `meta`: the canvas (`WidgetSlot`) and the list view used when cells are too narrow (`widgets.tsx`). The list view used to omit it, which reset every pet to the default dog.
-- The panel loads owned pets and backgrounds in one inventory request (`type=PET,PET_BACKGROUND`). A request without a type returns the first 32 purchases of every kind, which once hid newly bought pets. A purchase refreshes every inventory query (`marketKeys.inventoryAll`).
+- The panel offers all built-in species. It loads existing inventory (`type=PET,PET_BACKGROUND`) and the background catalog, then merges scenes by id. No ownership check blocks selection. Global settings also save background metadata, so a catalog scene survives a reload.
 - `PET_NAME_SAVE_DEBOUNCE_MS`, `updateWidgetSettings` and the layout persistence are shared with other widgets. Do not special-case the pet there.
 - Nothing pet-specific is sent to a server by the pet code. For signed-in users the widget layout, including `meta`, syncs through the generic widget sync, and the backend stores `meta` unchanged (size-limited and sanitised, not whitelisted).
 
@@ -187,7 +187,7 @@ The container is a `button` labelled `غذا دادن به <name>`. Keyboard act
 - The menu calls it «حیوان خانگی» (`menuLabel` in the registry). Settings comes first with the name and the scene under it («زردآلو · جنگل شب»); a scene from the shop shows the name only, because its label is its id.
 - The ⋯ is the dark glass button for any scene, beside `WidgetContainer`. The scene is `isolate`: the play button's `z-index: 50` stays inside it. Without that the button and the ⋯ (`z-30`) stacked in the canvas frame's context and the button won, so a click on the ⋯ fed the pet. `container-type: size` on the container does not make a stacking context, as this file used to claim; a headless Chrome render of the same structure put the click on the play button.
 - A scene with an image paints it on its own rounded box, and the container drops its surface (`background={!scene.image}`). Drawn over the light theme's white surface, the anti-aliased edge of the clipped image let the white through, a thin light rim on a dark scene. The `none` scene keeps the surface.
-- The settings panel follows the design board's layout at the design's width. The modal is `lg` widened to `max-w-2xl` (`className` in `widget-settings.tsx`): a 672 px box, 640 px inside, which is what the design draws, so the first column is the design's 256 px. The species grid still shows only the free and owned species, as before.
+- The settings panel follows the design board's layout at the design's width. The modal is `lg` widened to `max-w-2xl` (`className` in `widget-settings.tsx`): a 672 px box, 640 px inside, which is what the design draws, so the first column is the design's 256 px. The species grid still shows only the free and available species, as before.
 
 ## Sprite spec
 

@@ -1,6 +1,6 @@
 # Wigi-arz widget
 
-Live prices of currencies, gold, coins, crypto and services (subscriptions and cloud plans). Two models: a list at 2x3 and one currency at 1x1 (PRO). The list rows are also drawn inside the combo widget.
+Live prices of currencies, gold, coins, crypto and services (subscriptions and cloud plans). Two models: a list at 2x3 and one currency at 1x1. The list rows are also drawn inside the combo widget.
 
 ## Files
 
@@ -12,7 +12,7 @@ Live prices of currencies, gold, coins, crypto and services (subscriptions and c
 | `components/currency-list.tsx`, `components/sortable-currency-box.tsx` | Drag to reorder. |
 | `components/currency-box.tsx` | One row, padded like a task row: icon, code, name, price and change. The drag handle sits outside the row, in the card's margin beside it, and fades in on hover; the list reaches into that margin (`-ms-2.5 ps-2.5`) so its `overflow-x-hidden` does not clip the handle. |
 | `components/price-change.tsx` | The change with its arrow and colour: in percent by default, or as an amount when `amount` is given (the list rows and the 1x1 show the amount; the modal header shows the day's percent in a pill). Draws nothing when the percent rounds to zero, so a row never says «۰٪». |
-| `components/currency-modal.tsx` | The approved design in `design/currency-chart/`: a header with the icon, the name, the code and, for pro, the range control; the large price with «تومان» or «دلار» and the day's change; the chart from edge to edge; the converter as the footer, with a swap button (`currency_converter_swapped`), hidden for services. No close button: the backdrop and Escape close it. Each row keeps its own modal mounted and only toggles it, so it opens and closes with the animation. |
+| `components/currency-modal.tsx` | The approved design in `design/currency-chart/`: a header with the icon, the name, the code and the range control; the large price with «تومان» or «دلار» and the day's change; the chart from edge to edge; the converter as the footer, with a swap button (`currency_converter_swapped`), hidden for services. No close button: the backdrop and Escape close it. Each row keeps its own modal mounted and only toggles it, so it opens and closes with the animation. |
 | `components/currency-history.tsx` | The chart section of the modal and `HistoryRangeTabs` (روز، هفته، ماه), which the modal puts in its header. The range lives in the modal. It shows the chart, a skeleton while loading, a retry on failure, or «هنوز داده‌ی کافی برای نمودار جمع نشده» when the server has fewer than two points. Only fetches while the modal is open. |
 | `components/price-chart.tsx` | The SVG area chart: a smooth line with a light fill, no gridlines, and five time labels under it, the last one «الان». Moving the pointer over it shows the nearest point with its real price and time. Always `dir="ltr"`, time runs left to right. |
 | `components/currency-empty.tsx` | The empty list: the coin icon, a line and «افزودن ارز». |
@@ -42,7 +42,7 @@ The server adds entries of `type: 'service'` to `/currencies/supported-list` for
 
 ## History chart
 
-- Pro only. The server answers `?history=` only for a signed-in VIP (401 without a token, 403 `VIP_REQUIRED`). The modal asks `useAuth().isVip` first and, for anyone else, shows a locked card instead of the chart: «ورود به حساب» (opens the profile) when signed out, «دیدن اشتراک پرو» (opens the VIP settings) otherwise; the button also closes the modal. It draws the same card when the server still answers 401 or 403 (`isHistoryLocked`), so a VIP that ended since the profile was cached does not see a broken chart. The query does not run for a non-VIP.
+- All users can open history and select a range. The query runs when the modal is open. A backend rejection uses the regular load-error state with retry; it never opens a subscription page. The backend previously restricted this endpoint, so live access for free and signed-out accounts still needs verification.
 - Data: `useGetCurrencyHistory` in `src/services/currency` asks `/currencies/<code>?history=24h|7d|30d` and keeps `priceHistory`. The API sends `[]` without `history`, so the list rows never ask for it. The service worker caches each range apart (the key is the full URL).
 - Units: history `price` is in the same unit as the API's `price`: rial for currencies and coins, dollars for crypto. The chart shows what the modal shows, so `toDisplayValue` divides rial by 10 and leaves dollars (`getPrice(...).isDollar` decides).
 - Colour: follows the colour mode, like `PriceChange`; a range that rounds to 0.0 is neutral.
@@ -65,6 +65,6 @@ Settings comes first, with "۶ ارز انتخاب شده" or "ارز: USD" unde
 
 ## Not checked on screen
 
-The redesigned modal: the header with a long name, the range control in the header, the price row with a long coin price, the chart from edge to edge and its time labels on all three ranges, the locked card signed out and signed in without pro, the skeleton, the failed and the empty states, the tooltip near both edges, touch, the line colour in a light and a dark theme, the converter and its swap button, and a service without the converter.
+The redesigned modal: the header with a long name, the range control in the header, the price row with a long coin price, the chart from edge to edge and its time labels on all three ranges, history signed out and signed in, including a backend rejection, the skeleton, the failed and the empty states, the tooltip near both edges, touch, the line colour in a light and a dark theme, the converter and its swap button, and a service without the converter.
 
 The rows in the list and in the combo widget, the drag handle fading in and while dragging, the header time and «به‌روز می‌شه…», the 1x1 with a long price at the narrowest 1x1, the 1x1 change amount beside «تومان» for a large one such as a coin, the 1x1 empty and failed states, the empty list.

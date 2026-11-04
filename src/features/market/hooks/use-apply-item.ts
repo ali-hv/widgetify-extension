@@ -32,7 +32,7 @@ export function useApplyItem(): (item: StoreItem) => Promise<boolean> {
 		return ownedTitleId(data, item.value) ?? item.id
 	}
 
-	return async (item) => {
+	const apply = async (item: StoreItem): Promise<boolean> => {
 		switch (item.type) {
 			case 'THEME':
 				Analytics.event('theme_selected')
@@ -66,6 +66,17 @@ export function useApplyItem(): (item: StoreItem) => Promise<boolean> {
 			default:
 				return false
 		}
+	}
+	return async (item) => {
+		Analytics.event('market_item_apply_started', { type: item.type })
+		const [error, applied] = await safeAwait<unknown, boolean>(apply(item))
+		if (error || !applied) {
+			Analytics.event('market_item_apply_failed', { type: item.type })
+			if (error) showToast(translateError(error) as string, 'error')
+			return false
+		}
+		Analytics.event('market_item_applied', { type: item.type })
+		return true
 	}
 }
 

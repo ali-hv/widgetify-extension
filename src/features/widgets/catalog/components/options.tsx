@@ -1,6 +1,6 @@
-import { Chip, VipBadge } from '@/components/ui'
-import { cn } from '@/common/utils/cn'
 import { t } from '@/common/i18n'
+import { cn } from '@/common/utils/cn'
+import { Chip } from '@/components/ui'
 import type {
 	WidgetDefinition,
 	WidgetSize,
@@ -11,22 +11,18 @@ interface AddWidgetOptionsProps {
 	definition: WidgetDefinition
 	selectedSize: WidgetSize
 	selectedVariant: WidgetVariantOption | null
-	isVip?: boolean
+
 	onSelectSize: (size: WidgetSize) => void
 	onSelectVariant: (variant: WidgetVariantOption) => void
-	isVariantVipOnly: (widgetKey: string, variantId?: string) => boolean
-	isSizeVipOnly: (widgetKey: string, size?: WidgetSize) => boolean
 }
 
 export function AddWidgetOptions({
 	definition,
 	selectedSize,
 	selectedVariant,
-	isVip = false,
+
 	onSelectSize,
 	onSelectVariant,
-	isVariantVipOnly,
-	isSizeVipOnly,
 }: AddWidgetOptionsProps) {
 	if (definition.variants && definition.variants.length > 0) {
 		return (
@@ -41,8 +37,6 @@ export function AddWidgetOptions({
 							(!selectedVariant &&
 								selectedSize.w === variant.size.w &&
 								selectedSize.h === variant.size.h)
-						const isVipBadge =
-							!isVip && isVariantVipOnly(definition.id, variant.id)
 
 						return (
 							<button
@@ -57,13 +51,6 @@ export function AddWidgetOptions({
 								)}
 							>
 								<span>{variant.title ?? t(variant.label)}</span>
-								{isVipBadge && (
-									<VipBadge
-										size="xs"
-										variant={isCurrent ? 'inverse' : 'subtle'}
-										text={t('ui.vip.pro')}
-									/>
-								)}
 							</button>
 						)
 					})}
@@ -84,30 +71,20 @@ export function AddWidgetOptions({
 					const isDefault =
 						definition.defaultSize.w === sizeOption.w &&
 						definition.defaultSize.h === sizeOption.h
-					const isVipBadge = !isVip && isSizeVipOnly(definition.id, sizeOption)
 
 					return (
 						<Chip
 							onClick={() => onSelectSize(sizeOption)}
 							key={`${sizeOption.w}x${sizeOption.h}`}
-							className={cn(
-								'py-1 flex items-center gap-1',
-								isVipBadge && !isCurrentSize && 'border-vip-fill-2'
-							)}
+							className="py-1 flex items-center gap-1"
 							selected={isCurrentSize}
 							dir="ltr"
 						>
 							<span>
 								{sizeOption.w} × {sizeOption.h}
 							</span>
-							{isVipBadge && (
-								<VipBadge
-									size="xs"
-									variant={isCurrentSize ? 'inverse' : 'subtle'}
-									text={t('ui.vip.pro')}
-								/>
-							)}
-							{isDefault && !isCurrentSize && !isVipBadge && (
+
+							{isDefault && !isCurrentSize && (
 								<span className="text-4xs text-fg-muted mr-1">
 									{t('widgets.catalog.defaultSize')}
 								</span>

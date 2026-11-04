@@ -15,11 +15,7 @@ export function MarketWallpaper({ selectedId, onOpen }: MarketWallpaperProps) {
 				title={t('market.wallpaperBrowser.wallpaperLabel')}
 				description={t('market.wallpaperPage.introBody')}
 			/>
-			<WallpaperBrowser
-				defaultAccess="coin"
-				selectedId={selectedId}
-				onPick={onOpen}
-			/>
+			<WallpaperBrowser selectedId={selectedId} onPick={onOpen} />
 		</>
 	)
 }

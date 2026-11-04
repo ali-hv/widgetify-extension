@@ -1,21 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import ms from 'ms'
 import { getMainClient } from '@/services/api'
 import { currencyKeys } from '@/services/currency/currency.keys'
 import type { FetchedCurrency } from '@/services/currency/get-currency-by-code.hook'
+import { useQuery } from '@tanstack/react-query'
+import ms from 'ms'
 
 export const CURRENCY_HISTORY_RANGES = ['24h', '7d', '30d'] as const
 
 export type CurrencyHistoryRange = (typeof CURRENCY_HISTORY_RANGES)[number]
-
-const LOCKED_STATUSES = [401, 403]
-
-export function isHistoryLocked(error: unknown): boolean {
-	return (
-		axios.isAxiosError(error) && LOCKED_STATUSES.includes(error.response?.status ?? 0)
-	)
-}
 
 export const useGetCurrencyHistory = (
 	currency: string,

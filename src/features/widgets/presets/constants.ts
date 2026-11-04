@@ -7,8 +7,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.default.title',
 
 		descriptionKey: 'widgets.presets.default.description',
-
-		isVip: false,
 		isFeatured: true,
 		category: 'daily',
 		widgets: [
@@ -85,7 +83,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		id: 'persian-big-clock',
 		titleKey: 'widgets.presets.persian-big-clock.title',
 		descriptionKey: 'widgets.presets.persian-big-clock.description',
-		isVip: false,
 		isFeatured: true,
 		category: 'minimal',
 		verticalAlign: 'center',
@@ -110,8 +107,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.simple-appearance.title',
 
 		descriptionKey: 'widgets.presets.simple-appearance.description',
-
-		isVip: false,
 		isFeatured: true,
 		category: 'daily',
 		verticalAlign: 'split-bottom',
@@ -166,8 +161,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.deep-work-flow.title',
 
 		descriptionKey: 'widgets.presets.deep-work-flow.description',
-
-		isVip: false,
 		isFeatured: true,
 		category: 'productivity',
 		widgets: [
@@ -228,8 +221,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.student-study-hub.title',
 
 		descriptionKey: 'widgets.presets.student-study-hub.description',
-
-		isVip: false,
 		isFeatured: false,
 		category: 'productivity',
 		widgets: [
@@ -290,8 +281,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.news-culture-magazine.title',
 
 		descriptionKey: 'widgets.presets.news-culture-magazine.description',
-
-		isVip: false,
 		isFeatured: false,
 		category: 'daily',
 		widgets: [
@@ -352,8 +341,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.cozy-lifestyle.title',
 
 		descriptionKey: 'widgets.presets.cozy-lifestyle.description',
-
-		isVip: false,
 		isFeatured: false,
 		category: 'lifestyle',
 		widgets: [
@@ -419,8 +406,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.habit-builder-compact.title',
 
 		descriptionKey: 'widgets.presets.habit-builder-compact.description',
-
-		isVip: false,
 		isFeatured: false,
 		category: 'productivity',
 		widgets: [
@@ -481,8 +466,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.crypto-finance-hub.title',
 
 		descriptionKey: 'widgets.presets.crypto-finance-hub.description',
-
-		isVip: true,
 		isFeatured: true,
 		category: 'finance',
 		verticalAlign: 'split-bottom',
@@ -532,8 +515,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.developer-cockpit.title',
 
 		descriptionKey: 'widgets.presets.developer-cockpit.description',
-
-		isVip: true,
 		isFeatured: false,
 		category: 'productivity',
 		widgets: [
@@ -594,8 +575,6 @@ export const PRESET_LAYOUTS: PresetLayout[] = [
 		titleKey: 'widgets.presets.habit-mindfulness.title',
 
 		descriptionKey: 'widgets.presets.habit-mindfulness.description',
-
-		isVip: true,
 		isFeatured: false,
 		category: 'lifestyle',
 		widgets: [

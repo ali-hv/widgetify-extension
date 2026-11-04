@@ -65,3 +65,9 @@ Hooks need React, so they are not tested. Anything pure that a hook uses (parsin
 The Google Calendar domain also provides `useRefreshGoogleCalendarEvents` in `date/get-google-calendar-events.hook.ts`. It uses the existing range query key and FRESH_REQUEST for explicit refreshes; the Todoist widget uses it alongside task sync.
 
 The Google event response accepts optional `originalStartTime`. The Todoist widget uses it for local completion identity when a recurring occurrence moves; calendar completion sends no API request.
+
+## Free access
+
+The extension makes no subscription, coin-package or asset-purchase requests. Catalogs, account sync and content services stay connected. Legacy pricing and entitlement fields in backend responses do not control local access. Cloud uploads, currency history, partner launches and layout sync can still return backend access errors; removing those server checks requires a backend change.
+
+`auth/should-refresh-auth.ts` limits token recovery to a failed request that carried authorization. A public request returning 401 rejects without sending a logout event or clearing local settings.

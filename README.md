@@ -81,3 +81,7 @@ Share ideas and problems through [GitHub issues](https://github.com/widgetify-ap
 ## License
 
 See [LICENSE](LICENSE).
+
+## Free access
+
+Widgetify has no subscription, coin purchases or paid feature controls. Widgets, layouts, clock styling, gallery assets and mini-app windows are free to use. The extension still connects to Widgetify for account sync and online content. The backend must also allow free accounts to use cloud uploads, currency history and any other formerly restricted endpoints.

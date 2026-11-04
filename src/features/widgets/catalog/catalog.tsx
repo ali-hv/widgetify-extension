@@ -1,47 +1,37 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
 import Analytics from '@/analytics'
-import { Badge, Button, Modal } from '@/components/ui'
+import { t } from '@/common/i18n'
 import { callEvent } from '@/common/utils/call-event'
-import { useAuth } from '@/context/auth.context'
-import { useOptionalFreeWidgets } from '@/features/widgets/widgets.context'
+import { Badge, Button, Modal } from '@/components/ui'
+import { usePartnerAccess } from '@/features/widgets/partner-access.context'
+import { useWidgetRegistry } from '@/features/widgets/registry'
 import type {
 	WidgetCategory,
 	WidgetSize,
 	WidgetVariantOption,
 } from '@/features/widgets/utils/layout-engine/types'
-import { useWidgetRegistry } from '@/features/widgets/registry'
-import { usePartnerAccess } from '@/features/widgets/partner-access.context'
-import { widgetTitle } from '../utils/partner-catalog/partner-definitions'
+import { useOptionalFreeWidgets } from '@/features/widgets/widgets.context'
 import { Icon } from '@/icons'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { WidgetHelpModal } from '../components/widget-help-modal'
 import { WidgetIcon } from '../components/widget-icon'
-import { useWidgetVipResolver } from '@/features/widgets/hooks/use-widget-vip-resolver'
-import { CATEGORIES, type AddWidgetModalProps } from './types'
+import { useWidgetCatalog } from '../hooks/use-widget-catalog'
+import { widgetTitle } from '../utils/partner-catalog/partner-definitions'
+import { AddWidgetActions } from './components/actions'
 import { AddWidgetGrid } from './components/grid'
+import { WidgetIntroduction } from './components/introduction'
 import { AddWidgetOptions } from './components/options'
 import { AddWidgetPreview } from './components/preview'
-import { WidgetIntroduction } from './components/introduction'
-import { AddWidgetActions } from './components/actions'
+import { CATEGORIES, type AddWidgetModalProps } from './types'
 import { buildCatalogView, countByCategory } from './utils/catalog-filter'
 import { focusTarget } from './utils/focus-target'
-import { t } from '@/common/i18n'
 
 export function AddWidgetModal({
 	isOpen,
 	editTarget,
 	onClose,
-	returnsToSettings,
 	focusWidgetId,
 }: AddWidgetModalProps) {
-	const { isVip } = useAuth()
-	const {
-		isWidgetVipOnly,
-		isVariantVipOnly,
-		isSizeVipOnly,
-		isWidgetNew,
-		featuredWidgetKeys,
-		maxFreeWidgets,
-	} = useWidgetVipResolver(isOpen)
+	const { isWidgetNew, featuredWidgetKeys } = useWidgetCatalog(isOpen)
 	const freeWidgets = useOptionalFreeWidgets()
 	const registry = useWidgetRegistry()
 	const { ensureAccess } = usePartnerAccess()
@@ -164,21 +154,8 @@ export function AddWidgetModal({
 	const activeCount = runtimeLayout.filter((w) => w.id === selectedDef?.id).length
 
 	const isCurrentlyActive = activeCount > 0
-	const isDuplicateRestricted =
-		Boolean(selectedDef?.canDuplicate) && isCurrentlyActive && !isVip
 
-	const canAddCustom = isVip
-		? Boolean(selectedDef?.canDuplicate || !isCurrentlyActive)
-		: !isCurrentlyActive
-
-	const isCurrentWidgetVipOnly = isWidgetVipOnly(selectedDef?.id)
-	const isCurrentVariantVipOnly = isVariantVipOnly(selectedDef?.id, selectedVariant?.id)
-	const isCurrentSizeVipOnly =
-		!selectedVariant && isSizeVipOnly(selectedDef?.id, selectedSize)
-	const isVipRequired =
-		isCurrentWidgetVipOnly || isCurrentVariantVipOnly || isCurrentSizeVipOnly
-
-	const isLimitReached = !isVip && runtimeLayout.length >= maxFreeWidgets
+	const canAddCustom = Boolean(selectedDef?.canDuplicate || !isCurrentlyActive)
 
 	const handleRemove = () => {
 		if (!selectedDef || !removeWidget) return
@@ -187,19 +164,8 @@ export function AddWidgetModal({
 		removeWidget(target.instanceId)
 	}
 
-	const openVipSettings = () => {
-		Analytics.event('widget_catalog_pro_locked')
-		callEvent('openSettings', 'vip')
-		if (returnsToSettings) onClose()
-	}
-
 	const handleSave = async () => {
 		if (!selectedDef || isLoading) return
-
-		if (isVipRequired && !isVip) {
-			openVipSettings()
-			return
-		}
 
 		if (isEditMode && editTarget && updateWidgetVariant) {
 			const success = updateWidgetVariant(
@@ -210,11 +176,6 @@ export function AddWidgetModal({
 			if (success) {
 				onClose()
 			}
-			return
-		}
-
-		if (isLimitReached) {
-			openVipSettings()
 			return
 		}
 
@@ -329,8 +290,6 @@ export function AddWidgetModal({
 						selectedId={selectedId}
 						onSelectWidget={handleSelectWidget}
 						runtimeLayout={runtimeLayout}
-						isVip={isVip}
-						isWidgetVipOnly={isWidgetVipOnly}
 						isWidgetNew={isWidgetNew}
 					/>
 
@@ -395,11 +354,8 @@ export function AddWidgetModal({
 										definition={selectedDef}
 										selectedSize={selectedSize}
 										selectedVariant={selectedVariant}
-										isVip={isVip}
 										onSelectSize={handleSizeChange}
 										onSelectVariant={handleVariantChange}
-										isVariantVipOnly={isVariantVipOnly}
-										isSizeVipOnly={isSizeVipOnly}
 									/>
 
 									<AddWidgetPreview
@@ -411,18 +367,13 @@ export function AddWidgetModal({
 
 								<div className="pt-2 border-t border-line shrink-0">
 									<AddWidgetActions
-										isVipRequired={isVipRequired}
-										isVip={isVip}
 										isEditMode={isEditMode}
-										isLimitReached={isLimitReached}
 										canAddCustom={canAddCustom}
 										isCurrentlyActive={isCurrentlyActive}
-										isDuplicateRestricted={isDuplicateRestricted}
 										selectedSize={selectedSize}
 										isLoading={isLoading}
 										onSave={handleSave}
 										onRemove={handleRemove}
-										onUpgrade={openVipSettings}
 									/>
 								</div>
 							</div>

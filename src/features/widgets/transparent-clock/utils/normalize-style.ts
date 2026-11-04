@@ -77,14 +77,6 @@ export function transparentClockStyleToMeta(
 	}
 }
 
-export function toFreeClockStyle(style: TransparentClockStyle): TransparentClockStyle {
-	return {
-		...DEFAULT_TRANSPARENT_CLOCK_STYLE,
-		weight: style.weight,
-		scale: style.scale,
-	}
-}
-
 export function resolveClockFace(
 	face: TransparentClockFace,
 	size: { w: number; h: number }

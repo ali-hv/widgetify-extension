@@ -9,7 +9,7 @@ Components that know the app but belong to no single feature. Primitives with no
 | `ui/` | Presentational primitives |
 | `gallery/` | Wallpaper, photo and icon pickers, behind the `@/components/gallery` barrel |
 | `auth/` | The "sign in first" modal |
-| `user-coin.tsx`, `mood-image.tsx`, `select-city.tsx` | Small shared pieces |
+| `mood-image.tsx`, `select-city.tsx` | Small shared pieces |
 
 ## Rules
 

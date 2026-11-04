@@ -95,7 +95,7 @@ A board is a promise about the code. Anything it shows has to be something the c
 
 ## Folders
 
-- [pro-tab](pro-tab/README.md): the Pro tab in settings
+- [pro-tab](pro-tab/README.md): archived Pro tab boards, retired with subscriptions
 - [browser-bookmarks](browser-bookmarks/README.md): the browser bookmarks panel under the search box
 - [bookmark-group-open](bookmark-group-open/README.md): the one-time group-open intro in the bookmark folder modal
 - [onboarding](onboarding/README.md): the pictures for the welcome modal and the first-run tour

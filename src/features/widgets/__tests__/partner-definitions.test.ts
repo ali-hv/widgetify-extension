@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test'
-import { validateLayout } from '../utils/layout-engine/validation'
+import type { PartnerCatalogItem } from '../types'
 import {
 	type StoredWidget,
 	type WidgetDefinition,
 	WidgetKeys,
 } from '../utils/layout-engine/types'
-import type { PartnerCatalogItem } from '../types'
+import { validateLayout } from '../utils/layout-engine/validation'
 import {
 	buildWidgetRegistry,
 	partnerDefinition,
@@ -38,14 +38,13 @@ const ITEM: PartnerCatalogItem = {
 	iconUrl: 'https://cdn.example.test/pomodoro.png',
 	description: 'یک تایمر ساده برای تمرکز',
 	category: 'productivity',
-	isVipOnly: true,
 	isNew: true,
 	allowedSizes: [
 		{ w: 2, h: 1 },
-		{ w: 4, h: 2, isVipOnly: true },
+		{ w: 4, h: 2 },
 	],
 	defaultSize: { w: 2, h: 1 },
-	variants: [{ id: 'wide', title: 'کامل', size: { w: 4, h: 2 }, isVipOnly: true }],
+	variants: [{ id: 'wide', title: 'کامل', size: { w: 4, h: 2 } }],
 	canDuplicate: true,
 	widgetUrl: 'https://iframes.example.test/w/pomodoro',
 	origin: 'https://iframes.example.test',
@@ -66,7 +65,7 @@ describe('partnerDefinition', () => {
 		expect(definition.description).toBe('یک تایمر ساده برای تمرکز')
 		expect(definition.iconUrl).toBe('https://cdn.example.test/pomodoro.png')
 		expect(definition.category).toBe('productivity')
-		expect(definition.isVipOnly).toBe(true)
+		expect(definition).not.toHaveProperty('isVipOnly')
 		expect(definition.isBeta).toBe(true)
 		expect(definition.canDuplicate).toBe(true)
 		expect(definition.allowedSizes).toEqual(ITEM.allowedSizes)
@@ -77,7 +76,6 @@ describe('partnerDefinition', () => {
 				label: 'widgets.registry.partner.label',
 				title: 'کامل',
 				size: { w: 4, h: 2 },
-				isVipOnly: true,
 				meta: { variant: 'wide' },
 			},
 		])

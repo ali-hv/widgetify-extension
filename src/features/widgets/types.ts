@@ -86,14 +86,12 @@ export type PartnerCategory = 'time' | 'productivity' | 'info' | 'lifestyle'
 export interface PartnerSize {
 	w: number
 	h: number
-	isVipOnly?: boolean
 }
 
 export interface PartnerVariant {
 	id: string
 	title: string
 	size: { w: number; h: number }
-	isVipOnly?: boolean
 	meta?: Record<string, unknown>
 }
 
@@ -105,7 +103,6 @@ export interface PartnerCatalogItem {
 	iconUrl: string | null
 	description: string | null
 	category: PartnerCategory
-	isVipOnly: boolean
 	isNew: boolean
 	allowedSizes: PartnerSize[]
 	defaultSize: { w: number; h: number }

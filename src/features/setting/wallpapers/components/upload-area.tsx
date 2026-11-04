@@ -1,14 +1,14 @@
 import { t } from '@/common/i18n'
-import { useRef, useState } from 'react'
-import type { Wallpaper } from '@/common/types/wallpaper.interface'
-import { useWallpaperUpload } from '../hooks/use-wallpaper-upload'
-import { useRemoveCustomWallpaper } from '@/services/wallpapers/upload-custom-wallpaper.hook'
-import { safeAwait } from '@/services/api'
 import { showToast } from '@/common/toast'
+import type { Wallpaper } from '@/common/types/wallpaper.interface'
 import { translateError } from '@/common/utils/translate-error'
-import { UploadLoading } from './upload/upload-loading'
-import { UploadEmpty } from './upload/upload-empty'
+import { safeAwait } from '@/services/api'
+import { useRemoveCustomWallpaper } from '@/services/wallpapers/upload-custom-wallpaper.hook'
+import { useRef, useState } from 'react'
+import { useWallpaperUpload } from '../hooks/use-wallpaper-upload'
 import { UploadActive } from './upload/upload-active'
+import { UploadEmpty } from './upload/upload-empty'
+import { UploadLoading } from './upload/upload-loading'
 
 interface UploadAreaProps {
 	customWallpaper: Wallpaper | null
@@ -28,10 +28,9 @@ export function UploadArea({
 	const { mutateAsync: removeCustomWallpaper, isPending: isRemoving } =
 		useRemoveCustomWallpaper()
 
-	const { processFile, isUploading, isLoadingConfig, isVip, vipMaxSize, freeMaxSize } =
-		useWallpaperUpload({
-			onWallpaperChange,
-		})
+	const { processFile, isUploading, isLoadingConfig, maxSize } = useWallpaperUpload({
+		onWallpaperChange,
+	})
 
 	const handleFileSelect = () => {
 		if (isUploading || isRemoving || isLoadingConfig) return
@@ -72,7 +71,7 @@ export function UploadArea({
 
 	const handleRemove = async () => {
 		if (isUploading || isRemoving) return
-		if (isVip && customWallpaper?.src?.startsWith('http')) {
+		if (customWallpaper?.src?.startsWith('http')) {
 			const [error] = await safeAwait(removeCustomWallpaper())
 			if (error) {
 				showToast(translateError(error) as string, 'error')
@@ -93,9 +92,7 @@ export function UploadArea({
 				<UploadEmpty
 					isDragging={isDragging}
 					isUploading={isUploading}
-					isVip={isVip}
-					vipMaxSize={vipMaxSize}
-					freeMaxSize={freeMaxSize}
+					maxSize={maxSize}
 					onFileSelect={handleFileSelect}
 					onDragOver={handleDragOver}
 					onDragLeave={handleDragLeave}
@@ -116,7 +113,7 @@ export function UploadArea({
 				type="file"
 				ref={fileInputRef}
 				className="hidden"
-				accept={isVip ? 'image/*,video/mp4,video/webm' : 'image/*'}
+				accept="image/*,video/mp4,video/webm"
 				onChange={handleFileChange}
 			/>
 		</>

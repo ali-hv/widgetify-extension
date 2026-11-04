@@ -1,27 +1,26 @@
-import { useState } from 'react'
 import Analytics from '@/analytics'
+import { Motion as motion, MotionPreferences, Presence } from '@/common/motion'
 import { purgeDeprecatedStorageKeys } from '@/common/storage'
 import { listenEvent } from '@/common/utils/call-event'
-import { StackedToaster } from '@/components/ui'
-import { GeneralSettingProvider } from '@/context/general-setting.context'
-import { FeatureIntroProvider } from '@/context/feature-intro.context'
-import { AccountContactProvider } from '@/features/setting/account/account-contact.context'
-import { PartnerAccessProvider } from '@/features/widgets/partner-access.context'
-import { FreeWidgetProvider } from '@/features/widgets/widgets.context'
-import { NavbarLayout } from '@/features/navbar/navbar'
-import { WidgetSettings } from '@/features/widgets/widget-settings/widget-settings'
-import { AddWidgetModal } from '@/features/widgets/catalog/catalog'
-import { Page, usePage } from '@/context/page.context'
-import { Motion as motion, MotionPreferences, Presence } from '@/common/motion'
 import { AuthRequiredModal } from '@/components/auth/auth-required-modal'
-import { MiniAppPage } from '@/pages/mini-apps/mini-apps.page'
+import { StackedToaster } from '@/components/ui'
+import { FeatureIntroProvider } from '@/context/feature-intro.context'
+import { GeneralSettingProvider } from '@/context/general-setting.context'
+import { Page, usePage } from '@/context/page.context'
+import { WallpaperProvider } from '@/context/wallpaper.context'
+import { NavbarLayout } from '@/features/navbar/navbar'
+import { AccountContactProvider } from '@/features/setting/account/account-contact.context'
+import { AddWidgetModal } from '@/features/widgets/catalog/catalog'
+import { PartnerAccessProvider } from '@/features/widgets/partner-access.context'
+import { WidgetSettings } from '@/features/widgets/widget-settings/widget-settings'
+import { FreeWidgetProvider } from '@/features/widgets/widgets.context'
 import { ExplorerPage } from '@/pages/explorer/explorer.page'
 import { HomePage } from '@/pages/home/home.page'
-import { useEffect } from 'react'
-import { useSyncClock } from '@/services/date/sync-clock.hook'
 import { useBlockBrowserContextMenu } from '@/pages/hooks/use-block-browser-context-menu'
 import { useWallpaperApply } from '@/pages/hooks/use-wallpaper-apply'
-import { WallpaperProvider } from '@/context/wallpaper.context'
+import { MiniAppPage } from '@/pages/mini-apps/mini-apps.page'
+import { useSyncClock } from '@/services/date/sync-clock.hook'
+import { useEffect, useState } from 'react'
 
 export function RootLayout() {
 	useWallpaperApply()
@@ -51,7 +50,6 @@ export function RootLayout() {
 function Main() {
 	const [isAddWidgetModalOpen, setIsAddWidgetModalOpen] = useState(false)
 	const [addWidgetEditTarget, setAddWidgetEditTarget] = useState<any>(null)
-	const [addWidgetReturnsToSettings, setAddWidgetReturnsToSettings] = useState(false)
 	const [addWidgetFocusId, setAddWidgetFocusId] = useState<string | null>(null)
 	const [miniAppFocusId, setMiniAppFocusId] = useState<string | null>(null)
 	const [showAuthRequired, setAuthRequired] = useState(false)
@@ -68,7 +66,6 @@ function Main() {
 					setAddWidgetEditTarget(null)
 				}
 				setAddWidgetFocusId(null)
-				setAddWidgetReturnsToSettings(Boolean(payload?.returnToSettings))
 				setIsAddWidgetModalOpen(true)
 				Analytics.event('widget_catalog_opened')
 			}
@@ -77,7 +74,6 @@ function Main() {
 		const openCatalogEvent = listenEvent('openWidgetCatalog', (widgetKey) => {
 			setPage(Page.Home)
 			setAddWidgetEditTarget(null)
-			setAddWidgetReturnsToSettings(false)
 			setAddWidgetFocusId(typeof widgetKey === 'string' ? widgetKey : null)
 			setIsAddWidgetModalOpen(true)
 			Analytics.event('widget_catalog_opened')
@@ -143,7 +139,6 @@ function Main() {
 								setAddWidgetEditTarget(null)
 								setAddWidgetFocusId(null)
 							}}
-							returnsToSettings={addWidgetReturnsToSettings}
 						/>
 					</FreeWidgetProvider>
 				</PartnerAccessProvider>

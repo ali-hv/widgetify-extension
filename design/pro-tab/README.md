@@ -1,8 +1,6 @@
-# Pro tab
+# Pro tab archive
 
-The redesign of the settings tab «ویجتیفای پرو» (`src/features/setting/vip/vip.tsx`).
-
-**Status:** approved and built. The owner picked direction A + D (a showcase hero with benefit cards) and asked for it to be implemented. The code is in `src/features/setting/vip/`.
+The owner retired subscriptions and payments. These boards record the former Pro tab; the extension no longer implements it.
 
 ## Boards
 
@@ -46,31 +44,9 @@ Owner decisions this design must keep:
 - No feature list names the Pro widgets, because that list changes.
 - The Pro hero art appears only in the hero, never as a wallpaper.
 
-## Facts from the code
+## Current product
 
-The window shows only what the code gates today:
-
-- `isVipOnly` sizes in `src/features/widgets/registry.tsx`
-- Pro presets
-- transparent clock styles
-- the photo widget
-- currency history
-- opening a mini app in its own window
-- the upload size
-- `accessVip` gallery assets, free with Pro
-
-The gallery opens in three places: profile avatars, bookmark icons and photo widget pictures.
-
-The upload limit is 40MB for Pro and 2MB for free by default, and the server config can change it (`use-wallpaper-upload.ts`). Read the number from that config; never write it into the copy.
-
-## Still open
-
-- New copy needs the owner's approval: the headline, the card texts, the window titles and lines.
-- The renewal line «یک بار پرداخت می‌کنی و خودکار تمدید نمیشه» assumes a one-time bank payment with no renewal, so the build leaves it out until the backend confirms it.
-- The button uses `brand`. Today's code uses `vip` for it.
-- The Pro badge stays `vip`, as `VipBadge` draws it.
-- Only the light theme is drawn. Check that the dark and glass themes hold up, with every colour taken from a token.
-- The hero art is approved. `stage.webp` and `wallpaper.webp` are still drafts.
+All former Pro features are available through their existing controls. The subscription tab, plans, payment bar and upgrade prompts have been removed. These archived boards do not specify the current UI.
 
 ## Art
 

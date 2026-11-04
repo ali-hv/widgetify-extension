@@ -3,7 +3,6 @@ import { DEFAULT_TRANSPARENT_CLOCK_STYLE, TRANSPARENT_CLOCK_FACES } from '../con
 import {
 	normalizeTransparentClockStyle,
 	resolveClockFace,
-	toFreeClockStyle,
 	transparentClockStyleToMeta,
 } from '../utils/normalize-style'
 
@@ -110,25 +109,6 @@ describe('transparentClockStyleToMeta', () => {
 		expect(
 			normalizeTransparentClockStyle(transparentClockStyleToMeta(style))
 		).toEqual(style)
-	})
-})
-
-describe('toFreeClockStyle', () => {
-	it('keeps weight and size and resets the pro parts', () => {
-		const pro = {
-			face: 'outline',
-			finish: 'glass',
-			weight: 300,
-			scale: 1.2,
-			color: '#f472b6',
-			glassTint: 90,
-			datePosition: 'above',
-		} as const
-		expect(toFreeClockStyle(pro)).toEqual({
-			...DEFAULT_TRANSPARENT_CLOCK_STYLE,
-			weight: 300,
-			scale: 1.2,
-		})
 	})
 })
 

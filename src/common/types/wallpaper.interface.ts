@@ -21,6 +21,7 @@ interface GradientColors {
 }
 
 export interface StoredWallpaper {
+	localOnly?: boolean
 	id: string
 	type: 'IMAGE' | 'VIDEO' | 'GRADIENT'
 	src: string

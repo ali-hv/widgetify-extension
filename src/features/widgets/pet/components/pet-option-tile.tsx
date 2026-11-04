@@ -1,16 +1,14 @@
-import type { ReactNode } from 'react'
 import { cn } from '@/common/utils/cn'
-import { Icon } from '@/icons'
+import type { ReactNode } from 'react'
 
 interface Prop {
 	label: string
 	selected?: boolean
 	onSelect: () => void
 	children: ReactNode
-	locked?: boolean
 }
 
-export function PetOptionTile({ label, selected, onSelect, children, locked }: Prop) {
+export function PetOptionTile({ label, selected, onSelect, children }: Prop) {
 	return (
 		<button
 			type="button"
@@ -23,11 +21,6 @@ export function PetOptionTile({ label, selected, onSelect, children, locked }: P
 					: 'font-semibold bg-fill text-fg-muted hover:bg-fill-2'
 			)}
 		>
-			{locked && (
-				<span className="absolute z-10 grid rounded-sm top-1.5 start-1.5 size-4.5 place-items-center bg-scrim text-image-fg">
-					<Icon name="lock" size={10} aria-hidden="true" />
-				</span>
-			)}
 			{children}
 			<span className="max-w-full truncate">{label}</span>
 		</button>

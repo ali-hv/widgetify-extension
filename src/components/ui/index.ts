@@ -5,8 +5,6 @@ export * from './avatar/avatar.variants'
 
 export * from './badge/badge'
 export * from './badge/badge.variants'
-export * from './badge/vip-badge'
-export * from './badge/vip-badge.variants'
 export * from './badge/floating-badge'
 
 export * from './bottom-sheet/bottom-sheet'
@@ -27,8 +25,8 @@ export * from './dropdown/dropdown'
 export * from './dropdown/dropdown-item'
 export * from './dropdown/dropdown-item.variants'
 
-export * from './illustrations/illustrations'
 export * from './empty-state/empty-state'
+export * from './illustrations/illustrations'
 
 export * from './image-slider/image-slider'
 export * from './image-slider/use-image-slider'

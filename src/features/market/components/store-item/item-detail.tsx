@@ -5,18 +5,18 @@ import { Icon } from '@/icons'
 import { ITEM_TYPE_META } from '../../constants'
 import type { StoreItem } from '../../types'
 import { ItemPreview, previewAspect } from '../previews/item-preview'
-import { PurchaseBox } from './purchase-box'
+import { ItemActions } from './item-actions'
 
 interface ItemDetailProps {
 	item: StoreItem
-	onSeeAllPackages: () => void
+
 	onClose?: () => void
 	onApplied?: () => void
 }
 
 export function ItemDetail({
 	item,
-	onSeeAllPackages,
+
 	onClose,
 	onApplied,
 }: ItemDetailProps) {
@@ -64,12 +64,7 @@ export function ItemDetail({
 				</p>
 			</header>
 
-			<PurchaseBox
-				key={item.id}
-				item={item}
-				onApplied={onApplied}
-				onSeeAllPackages={onSeeAllPackages}
-			/>
+			<ItemActions key={item.id} item={item} onApplied={onApplied} />
 		</article>
 	)
 }

@@ -5,7 +5,6 @@ export interface PresetLayout {
 	id: string
 	titleKey: MessageKey
 	descriptionKey: MessageKey
-	isVip: boolean
 	isFeatured: boolean
 	category: 'featured' | 'minimal' | 'productivity' | 'lifestyle' | 'finance' | 'daily'
 	verticalAlign?: 'top' | 'center' | 'bottom' | 'split-bottom'

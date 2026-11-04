@@ -1,20 +1,18 @@
-import { useQuery } from '@tanstack/react-query'
 import { getMainClient, safeAwait } from '@/services/api'
-import type { AxiosError, AxiosResponse } from 'axios'
 import { widgetsKeys } from '@/services/widgets/widgets.keys'
+import { useQuery } from '@tanstack/react-query'
+import type { AxiosError, AxiosResponse } from 'axios'
 
 interface ServerWidgetVariant {
 	id: string
 	label: string
 	size: { w: number; h: number }
-	isVipOnly?: boolean
 	meta?: Record<string, any>
 }
 
 interface ServerWidgetSizeOption {
 	w: number
 	h: number
-	isVipOnly?: boolean
 }
 
 interface ServerWidgetCatalogItem {
@@ -23,7 +21,6 @@ interface ServerWidgetCatalogItem {
 	emoji: string
 	icon?: string | null
 	category: string
-	isVipOnly?: boolean
 	isNew?: boolean
 	allowedSizes: ServerWidgetSizeOption[]
 	defaultSize: { w: number; h: number }

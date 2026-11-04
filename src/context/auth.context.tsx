@@ -1,5 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
 import {
 	clearLocalStorage,
 	clearStorage,
@@ -7,14 +5,15 @@ import {
 	setToStorage,
 } from '@/common/storage'
 import { listenEvent } from '@/common/utils/call-event'
-import { type UserProfile, useGetUserProfile } from '@/services/user/user-service.hook'
+import { useGetUserProfile, type UserProfile } from '@/services/user/user-service.hook'
 import { userKeys } from '@/services/user/user.keys'
+import { useQueryClient } from '@tanstack/react-query'
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
 
 interface AuthContextType {
 	isAuthenticated: boolean
 	token: string | null
 	user: UserProfile | null
-	isVip: boolean
 	isLoadingUser: boolean
 	profilePercentage: number
 	isSuccessFetchingUser: boolean
@@ -105,7 +104,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				isAuthenticated: !!token,
 				token,
 				user: activeUser || null,
-				isVip: Boolean(activeUser?.isVip ?? false),
 				isLoadingUser: initialLoading || (!!token && isLoading && !cachedUser),
 				login,
 				logout,

@@ -105,7 +105,7 @@ export const friends = {
 	'friends.card.loadFailed': 'نتونستیم کارت رو بیاریم',
 	'friends.card.retry': 'دوباره امتحان کن',
 	'friends.suggestions.title': 'شاید بشناسیشون',
-	'friends.suggestions.firstReward': 'اولین درخواستت سکه داره',
+	'friends.suggestions.firstReward': 'اولین درخواستت رو بفرست',
 	'friends.suggestions.mutual': '{count} دوست مشترک',
 	'friends.suggestions.interest': 'علاقه‌ی مشترک: {title}',
 	'friends.suggestions.city': 'هم‌شهری',

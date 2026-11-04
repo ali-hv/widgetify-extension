@@ -1,6 +1,6 @@
 import { t } from '@/common/i18n'
 import { cn } from '@/common/utils/cn'
-import { AvatarComponent, Button, Tooltip, VipBadge } from '@/components/ui'
+import { AvatarComponent, Button, Tooltip } from '@/components/ui'
 import { Icon, type IconName } from '@/icons'
 import { type FriendCard, useGetFriendCard } from '@/services/friends/friend-service.hook'
 import {
@@ -112,7 +112,6 @@ function ProfileCardView({
 						url={user.avatar}
 						placeholder={user.name}
 						size="xl"
-						isPro={Boolean(friend?.isPro)}
 						className="border-4 rounded-full border-surface"
 					/>
 					{friend?.mood && <MoodBadge mood={friend.mood} />}
@@ -138,7 +137,6 @@ function ProfileCardView({
 						<span className="text-base font-bold truncate text-fg-strong">
 							{user.name}
 						</span>
-						{friend?.isPro && <VipBadge size="xs" text={t('ui.vip.pro')} />}
 					</div>
 					<div dir="ltr" className="text-xs truncate text-fg-faint text-end">
 						@{user.username}

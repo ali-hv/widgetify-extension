@@ -60,7 +60,6 @@ function readSizes(value: unknown): PartnerSize[] {
 		if (seen.has(key)) continue
 		seen.add(key)
 		const size: PartnerSize = { w: entry.w, h: entry.h }
-		if ((entry as Raw).isVipOnly === true) size.isVipOnly = true
 		sizes.push(size)
 	}
 
@@ -83,7 +82,6 @@ function readVariants(value: unknown): PartnerVariant[] {
 			title,
 			size: { w: entry.size.w, h: entry.size.h },
 		}
-		if (entry.isVipOnly === true) variant.isVipOnly = true
 		if (isRaw(entry.meta)) variant.meta = entry.meta
 		variants.push(variant)
 	}
@@ -172,7 +170,6 @@ function normalizeItem(raw: unknown): PartnerCatalogItem | null {
 		iconUrl,
 		description,
 		category,
-		isVipOnly: raw.isVipOnly === true,
 		isNew: raw.isNew === true,
 		allowedSizes,
 		defaultSize: { w: defaultSize.w, h: defaultSize.h },

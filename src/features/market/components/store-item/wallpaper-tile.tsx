@@ -1,10 +1,9 @@
 import { t } from '@/common/i18n'
-import { ConfigKey } from '@/common/constants/config-keys'
 import { cn } from '@/common/utils/cn'
 import { Tile } from '@/components/ui'
 import { Icon } from '@/icons'
 import type { ItemState, StoreItem } from '../../types'
-import { faNumber, isAnimatedWallpaper, wallpaperCaption } from '../../utils/store-item'
+import { isAnimatedWallpaper, wallpaperCaption } from '../../utils/store-item'
 import { WallpaperMedia } from '../previews/wallpaper-media'
 
 interface WallpaperTileProps {
@@ -22,8 +21,7 @@ export function WallpaperTile({
 	onPick,
 	onTry,
 }: WallpaperTileProps) {
-	const locked = state === 'locked'
-	const canTry = locked && Boolean(onTry)
+	const canTry = false
 	const animated = item.wallpaper ? isAnimatedWallpaper(item.wallpaper) : false
 	const caption = item.wallpaper ? wallpaperCaption(item.wallpaper) : item.name
 
@@ -32,14 +30,7 @@ export function WallpaperTile({
 			bare
 			selected={selected}
 			onClick={onPick}
-			label={
-				locked
-					? t('market.wallpaperTile.priceAria', {
-							p0: item.name,
-							p1: faNumber(item.price),
-						})
-					: item.name
-			}
+			label={item.name}
 			media={item.wallpaper && <WallpaperMedia wallpaper={item.wallpaper} />}
 			overlay={
 				<>
@@ -57,21 +48,11 @@ export function WallpaperTile({
 							/>
 						</span>
 					)}
-					{(caption || locked) && (
+					{caption && (
 						<span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-2 pt-6 bg-linear-to-t from-scrim to-transparent">
 							<span className="font-medium truncate text-2xs text-image-fg">
 								{caption}
 							</span>
-							{locked && (
-								<span className="inline-flex items-center h-6 gap-1 px-1.5 font-bold rounded-lg shrink-0 bg-scrim text-image-fg text-2xs tabular-nums backdrop-glass">
-									{faNumber(item.price)}
-									<img
-										src={ConfigKey.WIG_COIN_ICON}
-										alt=""
-										className="size-4"
-									/>
-								</span>
-							)}
 						</span>
 					)}
 					{state === 'active' && (
