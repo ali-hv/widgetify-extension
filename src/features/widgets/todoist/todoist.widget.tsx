@@ -6,6 +6,9 @@ import {
 	useRefreshGoogleCalendarEvents,
 } from '@/services/date/get-google-calendar-events.hook'
 import { TodoistCalendar } from './components/todoist-calendar'
+import { useCalendarCompletion } from './hooks/use-calendar-completion'
+import { visibleCalendarEvents } from './utils/calendar-events'
+import { todoistTimeline } from './utils/task-timeline'
 import {
 	filterTodoistTasks,
 	todoistDateRange,
@@ -54,6 +57,18 @@ export function TodoistWidget() {
 	const calendarConnected = isAuthenticated && !!user?.connections?.includes('google')
 	const calendarEnabled = calendarConnected && !!view?.connected
 	const calendar = useGetGoogleCalendarEvents(calendarEnabled, range.start, range.end)
+	const calendarEvents = visibleCalendarEvents(
+		calendarEnabled ? (calendar.data ?? []) : [],
+		range.start,
+		range.end,
+		timezone
+	)
+	const calendarCompletion = useCalendarCompletion(
+		calendarEnabled && user
+			? user.email || user.phone || user.username || user.joinedAt
+			: null,
+		calendarEvents
+	)
 	const refreshCalendar = useRefreshGoogleCalendarEvents(
 		calendarEnabled,
 		range.start,
@@ -146,6 +161,7 @@ export function TodoistWidget() {
 		timezone,
 		project
 	)
+	const timeline = todoistTimeline(tasks, calendarCompletion.shown, timezone)
 	const emptyMessage =
 		taskView === 'today'
 			? t('todoist.todayEmpty')
@@ -198,6 +214,11 @@ export function TodoistWidget() {
 				{error && (
 					<Alert tone="warning" className="text-2xs">
 						{errorMessage(error)}
+					</Alert>
+				)}
+				{calendarCompletion.failed && (
+					<Alert tone="warning" className="text-2xs">
+						{t('todoist.storageError')}
 					</Alert>
 				)}
 				{!ready ? (
@@ -381,7 +402,9 @@ export function TodoistWidget() {
 							/>
 						) : (
 							<>
-								{tasks.length === 0 &&
+								{timeline.length === 0 &&
+									!calendarCompletion.loading &&
+									(!calendarEnabled || !calendar.isFetching) &&
 									(error ? (
 										<WidgetError
 											message={errorMessage(error)}
@@ -395,7 +418,13 @@ export function TodoistWidget() {
 									))}
 								{snapshot && (
 									<TodoistTaskList
-										tasks={tasks}
+										items={timeline}
+										timezone={timezone}
+										view={taskView}
+										calendarSaving={calendarCompletion.saving}
+										onCalendarComplete={(event) =>
+											void calendarCompletion.complete(event)
+										}
 										snapshot={snapshot}
 										busy={busy}
 										onEdit={openEditor}
@@ -410,12 +439,14 @@ export function TodoistWidget() {
 
 								<TodoistCalendar
 									view={taskView}
-									timezone={timezone}
-									range={range}
 									isAuthenticated={isAuthenticated}
 									connected={calendarConnected}
-									events={calendar.data}
-									loading={calendar.isFetching}
+									shownCount={calendarCompletion.shown.length}
+									loading={
+										calendarEnabled &&
+										(calendar.isFetching ||
+											calendarCompletion.loading)
+									}
 									error={calendar.isError}
 									onRetry={retryCalendar}
 								/>

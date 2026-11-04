@@ -3,7 +3,7 @@ import type { GoogleCalendarEvent } from '@/services/date/get-google-calendar-ev
 
 type CalendarPoint = GoogleCalendarEvent['start']
 
-function pointTime(point: CalendarPoint, timezone: string): number {
+export function calendarPointTime(point: CalendarPoint, timezone: string): number {
 	const value = point.dateTime || point.date
 	if (!value) return Number.NaN
 	return momentTz.tz(value, point.timeZone || timezone).valueOf()
@@ -21,8 +21,8 @@ export function visibleCalendarEvents(
 	return events
 		.filter((event) => {
 			if (event.status === 'cancelled') return false
-			const begins = pointTime(event.start, timezone)
-			const ends = pointTime(event.end, timezone)
+			const begins = calendarPointTime(event.start, timezone)
+			const ends = calendarPointTime(event.end, timezone)
 			const key = `${event.id}:${event.start.dateTime || event.start.date}`
 			if (
 				!Number.isFinite(begins) ||
@@ -35,12 +35,16 @@ export function visibleCalendarEvents(
 			seen.add(key)
 			return true
 		})
-		.sort((a, b) => pointTime(a.start, timezone) - pointTime(b.start, timezone))
+		.sort(
+			(a, b) =>
+				calendarPointTime(a.start, timezone) -
+				calendarPointTime(b.start, timezone)
+		)
 }
 
 export function calendarEventTiming(event: GoogleCalendarEvent, timezone: string) {
-	const begins = pointTime(event.start, timezone)
-	const ends = pointTime(event.end, timezone)
+	const begins = calendarPointTime(event.start, timezone)
+	const ends = calendarPointTime(event.end, timezone)
 	const timeOptions = {
 		timeZone: timezone,
 		hour: '2-digit',

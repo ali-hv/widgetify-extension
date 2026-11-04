@@ -65,6 +65,9 @@ const ANALYTICS_EVENTS = [
 	'todoist_calendar_load_failed',
 	'todoist_calendar_connection_opened',
 	'todoist_calendar_event_opened',
+	'todoist_calendar_event_completed',
+	'todoist_calendar_completion_failed',
+	'todoist_calendar_completion_load_failed',
 
 	'todoist_token_help_opened',
 	'todoist_opened',

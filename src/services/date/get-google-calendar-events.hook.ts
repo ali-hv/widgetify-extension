@@ -29,6 +29,11 @@ export interface GoogleCalendarEvent {
 		date?: string
 		timeZone?: string
 	}
+	originalStartTime?: {
+		dateTime?: string
+		date?: string
+		timeZone?: string
+	}
 	iCalUID: string
 	sequence: number
 	reminders: {

@@ -5,6 +5,7 @@ export const todoist = {
 	'todoist.todayEmpty': 'برای امروز تسکی نداری',
 	'todoist.tomorrowEmpty': 'برای فردا تسکی نداری',
 	'todoist.calendarTitle': 'رویدادهای تقویم گوگل',
+	'todoist.calendarSource': 'تقویم گوگل',
 	'todoist.calendarUpcoming': 'تقویم گوگل · ۳۰ روز آینده',
 	'todoist.calendarConnectHint': 'برای دیدن رویدادها، گوگل رو در ویجتیفای هم وصل کن',
 	'todoist.calendarConnect': 'اتصال تقویم گوگل',
