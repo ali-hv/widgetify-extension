@@ -28,7 +28,7 @@ Ask two questions in this order.
 | Two or more sibling folders | Their nearest common parent |
 | Two or more unrelated areas | The matching global layer |
 
-A global file used from one area is misplaced. `services/` is the exception: everything that talks to the server lives there.
+A global file used from one area is misplaced. Background and entrypoint imports count as consumers too. `services/` is the exception: everything that talks to the server lives there.
 
 2. **Which folder inside the owner?** The file's role decides, never the count: `components/`, `variants/`, `hooks/`, `utils/`, `__tests__/`. A helper used once and a helper used ten times both live in `utils/`.
 

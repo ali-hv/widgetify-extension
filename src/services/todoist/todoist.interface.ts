@@ -97,6 +97,7 @@ export type TodoistRequest = (
 	| { action: 'sync' }
 	| { action: 'connect'; token: string }
 	| { action: 'disconnect' }
+	| { action: 'reschedule'; ids: string[]; date: string; timezone: string }
 	| {
 			action: 'save'
 			id?: string

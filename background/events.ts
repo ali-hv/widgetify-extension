@@ -1,3 +1,4 @@
+import { setupStartupVideo } from './startup-video'
 import { handleTodoistRequest } from '../src/services/todoist/todoist-client'
 import { cleanupOutdatedCaches } from 'workbox-precaching'
 import Analytics from '../src/analytics'
@@ -8,6 +9,7 @@ import { initActiveWallpaper, setActiveWallpaper } from './wallpaper-cache'
 import { type SwEvent, SwEventType } from '../src/common/types/sw-events.interface'
 
 export function setupEventListeners() {
+	const claimStartupVideo = import.meta.env.FIREFOX ? null : setupStartupVideo()
 	if (!import.meta.env.FIREFOX) {
 		browser.action.onClicked?.addListener(() => {
 			browser.tabs.create({ url: browser.runtime.getURL('/newtab.html') })
@@ -49,8 +51,11 @@ export function setupEventListeners() {
 		await handleTodoistRequest({ action: 'sync' })
 	})
 
-	browser.runtime.onMessage.addListener(async (message: SwEvent) => {
+	browser.runtime.onMessage.addListener(async (message: SwEvent, sender) => {
 		switch (message.type) {
+			case SwEventType.ClaimStartupVideo:
+				if (typeof message.token !== 'string') return false
+				return claimStartupVideo?.(message.token, sender) ?? false
 			case SwEventType.TodoistRequest:
 				return handleTodoistRequest(message.request)
 			case SwEventType.DeleteCache: {

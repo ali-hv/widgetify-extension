@@ -103,3 +103,5 @@ A board is a promise about the code. Anything it shows has to be something the c
 - [release-notes](release-notes/README.md): the «آبنبات چوبی» release notes window
 
 - [todoist](todoist/README.md): token setup, task list and task editor
+
+- [startup-video](startup-video/README.md): approved Chrome startup video settings and modal

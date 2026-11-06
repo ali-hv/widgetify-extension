@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import momentTz from 'moment-timezone'
 import type { TodoistTask } from '@/services/todoist/todoist.interface'
-import { filterTodoistTasks, todoistDateRange } from '../utils/task-view'
+import {
+	filterTodoistTasks,
+	isTodoistTaskOverdue,
+	todoistDateRange,
+} from '../utils/task-view'
 
 function task(
 	id: string,
@@ -34,12 +38,45 @@ const tasks = [
 ]
 
 describe('Todoist task views', () => {
-	it('keeps Today strict, including floating times, without shifting all-day dates', () => {
+	it('retains overdue tasks in Today, including floating times, without shifting all-day dates', () => {
 		expect(
 			filterTodoistTasks(tasks, 'today', '2026-11-04', 'Asia/Tehran', '').map(
 				(item) => item.id
 			)
-		).toEqual(['today', 'local-evening'])
+		).toEqual(['today', 'overdue', 'local-evening'])
+	})
+	it('marks timed tasks overdue after their instant and all-day tasks after their day ends', () => {
+		const now = new Date('2026-11-04T08:00:00Z')
+		expect(
+			isTodoistTaskOverdue(task('past', '2026-11-04T10:00:00'), now, 'Asia/Tehran')
+		).toBe(true)
+		expect(
+			isTodoistTaskOverdue(
+				task('future', '2026-11-04T12:00:00'),
+				now,
+				'Asia/Tehran'
+			)
+		).toBe(false)
+		expect(
+			isTodoistTaskOverdue(task('all-day', '2026-11-04'), now, 'Asia/Tehran')
+		).toBe(false)
+		expect(
+			isTodoistTaskOverdue(task('previous', '2026-11-03'), now, 'Asia/Tehran')
+		).toBe(true)
+		expect(
+			isTodoistTaskOverdue(
+				task('fixed', '2026-11-04T08:00:00Z'),
+				now,
+				'Asia/Tehran'
+			)
+		).toBe(false)
+		expect(
+			isTodoistTaskOverdue(
+				task('done', '2026-11-03', { checked: true }),
+				now,
+				'Asia/Tehran'
+			)
+		).toBe(false)
 	})
 	it('selects tomorrow in the app timezone when a fixed timestamp crosses midnight', () => {
 		expect(

@@ -4,6 +4,10 @@ import { join } from 'node:path'
 import ts from 'typescript'
 
 const STORAGE_KEYS = [
+	'startupVideoDirectory',
+	'startupVideoRequest',
+	'startupVideoWindowsClosed',
+	'startupVideoWindowIds',
 	'todoistAccount',
 	'activeWidgets',
 	'analyticsSession',
@@ -60,6 +64,29 @@ const STORAGE_KEYS = [
 ]
 
 const ANALYTICS_EVENTS = [
+	'todoist_reschedule_opened',
+	'todoist_reschedule_submitted',
+	'todoist_reschedule_failed',
+	'todoist_rescheduled',
+	'startup_video_settings_opened',
+	'startup_video_settings_failed',
+	'startup_video_folder_opened',
+	'startup_video_folder_selected',
+	'startup_video_folder_cancelled',
+	'startup_video_folder_failed',
+	'startup_video_toggled',
+	'startup_video_toggle_failed',
+	'startup_video_navigated',
+	'startup_video_navigation_failed',
+	'startup_video_reconnect_started',
+	'startup_video_reconnect_failed',
+	'startup_video_reconnected',
+	'startup_video_playback_failed',
+	'startup_video_played',
+	'startup_video_opened',
+	'startup_video_closed',
+	'startup_video_startup_failed',
+
 	'gallery_opened',
 	'gallery_load_failed',
 	'gallery_selected',

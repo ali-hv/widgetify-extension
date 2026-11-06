@@ -96,3 +96,9 @@ Old cache names are listed in `LEGACY_CACHES` and deleted on start and on activa
 ### Todoist startup sync
 
 The startup listener calls the Todoist service queue to refresh a connected account even before the dashboard opens. New-tab mounts and manual sync use the same queue through a typed runtime message. `https://api.todoist.com/*` is a host permission for these authenticated requests. Todoist responses bypass Workbox and the HTTP cache.
+
+### Startup video
+
+On Chrome, `background/startup-video.ts` registers an independent startup listener and opens one dashboard tab when the user enabled startup video. `startup-video-state.ts` serializes start and claim operations. A one-use token in browser session storage prevents other tabs or worker wakes from replaying the modal. It never waits for Todoist sync and requests no new extension permissions. Folder selection and any permission renewal happen in the dashboard after a user action; the background does not prompt for file access. Firefox does not register this listener.
+
+Startup covers a normal profile start and reopening a normal window after all normal windows closed while Chrome kept running. Window listeners remember handled normal-window IDs in session storage. On creation they compare those IDs with the current windows, so a missed or delayed close event cannot suppress the next launch. Startup and window creation share the same queue to avoid duplicate requests, including when Chrome restores several windows. Additional windows and tabs do not trigger a request. Test both a full browser exit and closing all windows, restored tabs, concurrent new windows, denied directory permission and a worker restart.

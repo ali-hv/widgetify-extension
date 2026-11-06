@@ -4,7 +4,7 @@ One folder per product feature. Widgets are features too and live in `widgets/` 
 
 ## What is here
 
-`explorer`, `friends`, `market`, `mini-apps`, `navbar`, `release-notes`, `setting`, `widgets`. `src/features/` holds only feature folders, nothing loose.
+`explorer`, `friends`, `market`, `mini-apps`, `navbar`, `release-notes`, `setting`, `startup-video`, `widgets`. `src/features/` holds only feature folders, nothing loose.
 
 ## Rules
 
@@ -67,3 +67,15 @@ A notification (the navbar card or the home dialog) can open one mini-app. In th
 ## Free features and catalogs
 
 The market now offers direct selection and previews. Themes, fonts and titles from the catalog join bundled and inventory options without a claim step. Gallery photos, bookmark icons and avatars select directly. Settings has no subscription or coin-rewards tab, and profiles show no balance or Pro status. Existing sign-in and consent requirements remain for account-backed integrations.
+
+## Startup video
+
+`startup-video/` is Chrome-only. Its entry mounts the paused startup modal in the page shell; `startup-video-setting.tsx` is the public General settings section. The user selects a live directory, then enables the feature. Selection validates a readable video candidate before saving, and disabling retains the folder. The folder handle and preference stay on the device across account sign-out.
+
+`startup-video/hooks/use-video-folder.ts` checks read permission, scans direct child files when the modal opens and before navigation, and merges added or removed files into the current shuffled order. Previous and next wrap, remain paused, and are disabled for one file. The supported containers depend on the browser's `canPlayType`; a corrupt or unsupported codec shows a playback error. No video is copied or uploaded. A matching `.vtt` sidecar can supply native captions.
+
+`startup-video/components/video-playback.tsx` creates local object URLs, starts only after Play and pauses and releases media and caption URLs on close or navigation. The modal stays mounted; its Close button, Escape and backdrop dismissal work during loading and permission errors. Missing permission offers reconnect; an empty or missing folder offers another selection. The shared Modal supplies its standard accessible close icon.
+
+The background owns a one-use startup request. The startup dashboard consumes it before opening the modal and removes the token from its URL. Ordinary tabs, reloads, additional windows and worker wakes do not create requests. Reopening after all normal windows close creates one request even when Chrome keeps running in the background. Private profile startup is outside this feature's scope. Firefox builds omit the setting, picker and startup listener.
+
+Tests cover startup consumption, missed or delayed close events, repeated launches with restored windows, worker restarts, stored settings validation, live file filtering, deleted files, shuffled ordering, navigation and empty folders. Check actual startup, permissions, local playback and the modal in light, dark, glass and icy by eye, including 500px and signed out. Analytics records feature actions and failures without file or directory names or paths.

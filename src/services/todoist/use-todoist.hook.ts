@@ -65,6 +65,7 @@ export function useTodoist() {
 	})
 	const perform = async (request: TodoistRequest): Promise<boolean> => {
 		const isWrite =
+			request.action === 'reschedule' ||
 			request.action === 'save' ||
 			request.action === 'complete' ||
 			request.action === 'delete'

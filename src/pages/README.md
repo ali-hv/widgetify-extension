@@ -29,3 +29,6 @@ The screens the new tab can show, and the shell that switches between them.
 ## Tests
 
 `__tests__/block-browser-context-menu.test.ts` covers the listener. The rest is composition and is checked on screen.
+
+
+On Chrome, the shell mounts `StartupVideo` inside General settings so it can use the shared Modal. It consumes only a startup token supplied by the background; a normal page mount never creates a startup request. Firefox omits the feature.

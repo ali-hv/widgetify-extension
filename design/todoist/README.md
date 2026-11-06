@@ -43,3 +43,18 @@ Timed tasks and Google events share one list, ordered by date and clock time, ea
 The calendar event title keeps its Google Calendar link. Its completion circle is a separate button beside that link. Completing an event hides only that occurrence in this widget and saves the choice in local extension storage, scoped to the Widgetify account. A recurring event's next occurrence remains visible. Refreshes and new tabs preserve hidden occurrences. A failed save keeps the event visible and shows the existing storage-error message. No request changes Google Calendar.
 
 The existing calendar connection, loading, error and empty messages stay below the combined list. No new popover or overlay is needed. Check interleaved event/task times, equal times, date-only order, all-day events, recurring events after completion, a reload after completion, disconnected Google, long titles and keyboard access at the narrowest widget size. Also check light without wallpaper and glass/icy over a busy wallpaper.
+
+
+## Rescheduling
+
+Status: the owner approved the proposal and requested a Reschedule All button before implementation. [The revised board](assets/reschedule-all.png), drawn by `art/reschedule-all.py`, adds that requested control beside the overdue count. Earlier boards remain alongside it.
+
+[The rescheduling proposal](assets/reschedule.png), drawn by `art/reschedule.py`, shows overdue tasks retained above the Today timeline, a task's quick-date menu, and the Jalali picker. This raster reference follows the existing boards; no canvas export is available.
+
+Today includes unfinished tasks from earlier dates. A timed task becomes overdue when its due time passes in the selected Widgetify timezone; an all-day task becomes overdue after its due day ends. Overdue tasks remain visible until completed or rescheduled. Tomorrow keeps its date scope, and Upcoming still includes all active tasks. Project filters continue to apply.
+
+Each overdue task has a visible «تغییر تاریخ» button. It opens the shared PopoverMenu with «امروز», «فردا» and «انتخاب تاریخ…». Today and Tomorrow save immediately. The custom-date view uses the existing DatePicker, a Save button and Cancel. Cancel, Escape and clicking outside leave the task unchanged. The date picker replaces the quick menu inside the same popover; it does not nest another overlay. No new UI primitive is needed.
+
+Rescheduling changes the task's date in Todoist and retains its time and recurrence. Moving a task whose clock time has already passed to Today can still leave it overdue. The task is never completed or duplicated. During saving, prevent duplicate submissions; a failure keeps the original task and date visible and permits retry. Google Calendar events are not rescheduled by this action. The «تغییر تاریخ همه» button opens the same quick choices and date picker for the overdue Todoist tasks visible under the current project filter. Its menu shows the number of affected tasks. It excludes Google events, completed tasks and tasks outside the filter. Batch commands use separate stable IDs and groups of at most 100; a partial failure preserves confirmed changes and reports failure without claiming that the whole batch succeeded.
+
+Copy follows the approved board and the requested batch action. The popover uses the existing frosted surface token, 16px corners and 32px or larger quick actions. The date grid follows the existing compact DatePicker. Verify the menu at the narrowest widget width, long task names, keyboard dismissal, saving/failure states, signed out of Widgetify, light without wallpaper, dark, and glass/icy over a busy wallpaper.

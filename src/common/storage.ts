@@ -242,3 +242,63 @@ export async function measureSavedData(): Promise<number> {
 	const snapshot = await storage.snapshot('local')
 	return new Blob([JSON.stringify(snapshot)]).size
 }
+
+function openDeviceFileDatabase(): Promise<IDBDatabase> {
+	return new Promise((resolve, reject) => {
+		const request = indexedDB.open('widgetify-device-files', 1)
+		request.onupgradeneeded = () => {
+			request.result.createObjectStore('selections')
+		}
+		request.onsuccess = () => resolve(request.result)
+		request.onerror = () => reject(request.error)
+		request.onblocked = () => reject(new Error('DEVICE_FILES_BLOCKED'))
+	})
+}
+
+export async function getDeviceFileSelection<K extends keyof StorageKV>(
+	key: K
+): Promise<StorageKV[K] | null> {
+	const database = await openDeviceFileDatabase()
+	try {
+		return await new Promise((resolve, reject) => {
+			const transaction = database.transaction('selections', 'readonly')
+			const request = transaction.objectStore('selections').get(key)
+			transaction.oncomplete = () => resolve(request.result ?? null)
+			transaction.onabort = () => reject(transaction.error)
+			transaction.onerror = () => reject(transaction.error)
+		})
+	} finally {
+		database.close()
+	}
+}
+
+export async function setDeviceFileSelection<K extends keyof StorageKV>(
+	key: K,
+	value: StorageKV[K]
+): Promise<void> {
+	const database = await openDeviceFileDatabase()
+	try {
+		await new Promise<void>((resolve, reject) => {
+			const transaction = database.transaction('selections', 'readwrite')
+			transaction.objectStore('selections').put(value, key)
+			transaction.oncomplete = () => resolve()
+			transaction.onabort = () => reject(transaction.error)
+			transaction.onerror = () => reject(transaction.error)
+		})
+	} finally {
+		database.close()
+	}
+}
+
+export async function getSessionValue<K extends keyof StorageKV>(
+	key: K
+): Promise<StorageKV[K] | null> {
+	return storage.getItem(`session:${key}`) as Promise<StorageKV[K] | null>
+}
+
+export async function setSessionValue<K extends keyof StorageKV>(
+	key: K,
+	value: StorageKV[K]
+): Promise<void> {
+	await storage.setItem(`session:${key}`, value)
+}

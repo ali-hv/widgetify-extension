@@ -620,8 +620,11 @@ describe('layers', () => {
 
 	it('keep a global file only while two areas use it', () => {
 		const users = new Map<string, string[]>()
-		for (const [importer, target] of productEdges) {
-			users.set(target, [...(users.get(target) ?? []), importer])
+		for (const [importer, targets] of imports) {
+			if (isTest(importer)) continue
+			for (const target of targets) {
+				users.set(target, [...(users.get(target) ?? []), importer])
+			}
 		}
 		const misplaced = projectFiles.filter((path) => {
 			const layer = layerOf(path)

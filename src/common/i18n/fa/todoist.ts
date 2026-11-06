@@ -1,4 +1,11 @@
 export const todoist = {
+	'todoist.overdue': 'عقب‌افتاده‌ها · {count}',
+	'todoist.reschedule': 'تغییر تاریخ',
+	'todoist.rescheduleTask': 'تغییر تاریخ {title}',
+	'todoist.rescheduleAll': 'تغییر تاریخ همه',
+	'todoist.chooseRescheduleDate': 'انتخاب تاریخ…',
+	'todoist.rescheduleCount': '{count} تسک عقب‌افتاده',
+	'todoist.rescheduleError': 'تاریخ همه‌ی تسک‌ها تغییر نکرد، دوباره امتحان کن',
 	'todoist.today': 'امروز',
 	'todoist.tomorrow': 'فردا',
 	'todoist.upcoming': 'پیش رو',

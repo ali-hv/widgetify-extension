@@ -1,3 +1,4 @@
+import { StartupVideo } from '@/features/startup-video/startup-video'
 import Analytics from '@/analytics'
 import { Motion as motion, MotionPreferences, Presence } from '@/common/motion'
 import { purgeDeprecatedStorageKeys } from '@/common/storage'
@@ -38,6 +39,7 @@ export function RootLayout() {
 					<FeatureIntroProvider>
 						<WallpaperProvider>
 							<Main></Main>
+							{!import.meta.env.FIREFOX && <StartupVideo />}
 						</WallpaperProvider>
 					</FeatureIntroProvider>
 				</GeneralSettingProvider>

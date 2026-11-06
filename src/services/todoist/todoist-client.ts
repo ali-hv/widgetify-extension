@@ -1,7 +1,9 @@
 import { v4 as uuid } from 'uuid'
 import { TodoistFailure, syncTodoist } from './sync-request'
 import { todoistCommands } from './task-commands'
+import { syncTodoistBatches } from './sync-batches'
 import Analytics from '@/analytics'
+import momentTz from 'moment-timezone'
 import { getFromStorage, removeFromStorage, setToStorage } from '@/common/storage'
 import { nowMs } from '@/common/utils/trusted-time'
 import { mergeTodoistSync, normalizeTodoistAccount, todoistView } from './sync-state'
@@ -45,30 +47,45 @@ async function execute(request: TodoistRequest): Promise<TodoistReply> {
 		}
 		if (account.retryAt && account.retryAt > nowMs())
 			throw new TodoistFailure('rate_limit', account.retryAt)
-		const commands = todoistCommands(request)
-		const response = await syncTodoist(
-			account.token,
-			account.snapshot.syncToken,
-			commands
-		)
-		const current = normalizeTodoistAccount(await getFromStorage('todoistAccount'))
 		if (
-			current?.token !== account.token ||
-			current?.connectionId !== account.connectionId
+			request.action === 'reschedule' &&
+			(!momentTz(request.date, 'YYYY-MM-DD', true).isValid() ||
+				!momentTz.tz.zone(request.timezone))
 		)
-			return { ok: true, view: todoistView(current) }
-		account = {
-			token: account.token,
-			connectionId: account.connectionId,
-			snapshot: mergeTodoistSync(account.snapshot, response, nowMs()),
-		}
-		await setToStorage('todoistAccount', account)
-		if (commands.some((command) => response.sync_status?.[command.uuid] !== 'ok'))
 			throw new TodoistFailure('request')
+		const commands = todoistCommands(request, account.snapshot.items)
+		const previous = account
+		const finished = await syncTodoistBatches(
+			previous.token,
+			previous.snapshot.syncToken,
+			commands,
+			async (response) => {
+				const current = normalizeTodoistAccount(
+					await getFromStorage('todoistAccount')
+				)
+				if (
+					current?.token !== previous.token ||
+					current?.connectionId !== previous.connectionId
+				) {
+					account = current
+					return false
+				}
+				account = {
+					token: previous.token,
+					connectionId: previous.connectionId,
+					snapshot: mergeTodoistSync(current.snapshot, response, nowMs()),
+				}
+				await setToStorage('todoistAccount', account)
+				return true
+			}
+		)
+		if (!finished) return { ok: true, view: todoistView(account) }
 		if (request.action === 'sync') Analytics.event('todoist_synced')
 		if (request.action === 'save') Analytics.event('todoist_saved')
 		if (request.action === 'complete') Analytics.event('todoist_completed')
 		if (request.action === 'delete') Analytics.event('todoist_deleted')
+		if (request.action === 'reschedule')
+			Analytics.event('todoist_rescheduled', { count: request.ids.length })
 		return { ok: true, view: todoistView(account) }
 	} catch (error) {
 		const failure =

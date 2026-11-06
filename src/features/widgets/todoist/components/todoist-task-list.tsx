@@ -3,6 +3,7 @@ import type { GoogleCalendarEvent } from '@/services/date/get-google-calendar-ev
 import type { TodoistTimelineItem } from '../utils/task-timeline'
 import type { TodoistTaskView } from '../utils/task-view'
 import { TodoistCalendarEvent } from './todoist-calendar-event'
+import { TodoistReschedule } from './todoist-reschedule'
 import { t } from '@/common/i18n'
 import { cn } from '@/common/utils/cn'
 import { Icon } from '@/icons'
@@ -18,6 +19,8 @@ interface TodoistTaskListProps {
 	busy: boolean
 	onEdit: (task: TodoistTask) => void
 	onComplete: (id: string) => void
+	overdue?: boolean
+	onReschedule: (ids: string[], date: string) => Promise<boolean>
 }
 
 function dueLabel(task: TodoistTask, timezone: string) {
@@ -50,6 +53,8 @@ export function TodoistTaskList({
 	busy,
 	onEdit,
 	onComplete,
+	overdue = false,
+	onReschedule,
 }: TodoistTaskListProps) {
 	return (
 		<ul className="flex flex-col gap-1">
@@ -85,37 +90,53 @@ export function TodoistTaskList({
 						>
 							<span className="w-4 h-4 border rounded-full border-current" />
 						</button>
-						<button
-							type="button"
-							disabled={busy}
-							className="flex flex-col flex-1 min-w-0 gap-1 py-1 text-start rounded-lg cursor-pointer focus-visible:focus-ring"
-							onClick={() => onEdit(task)}
-						>
-							<span
-								dir="auto"
-								className="w-full text-xs text-fg break-words"
+						<div className="flex flex-col flex-1 min-w-0 items-start gap-1">
+							<button
+								type="button"
+								disabled={busy}
+								className="flex flex-col w-full min-w-0 gap-1 py-1 text-start rounded-lg cursor-pointer focus-visible:focus-ring"
+								onClick={() => onEdit(task)}
 							>
-								{task.content}
-							</span>
-							<span className="text-3xs text-fg-muted">
-								{[
-									dueLabel(task, timezone),
-									snapshot.projects.find(
-										(project) => project.id === task.project_id
-									)?.name,
-								]
-									.filter(Boolean)
-									.join(' · ')}
-								{task.due?.is_recurring && (
-									<Icon
-										name="refresh"
-										size={10}
-										className="inline-block ms-1"
-										aria-label={t('todoist.repeat')}
-									/>
-								)}
-							</span>
-						</button>
+								<span
+									dir="auto"
+									className="w-full text-xs text-fg break-words"
+								>
+									{task.content}
+								</span>
+								<span
+									className={cn(
+										'text-3xs',
+										overdue ? 'text-danger' : 'text-fg-muted'
+									)}
+								>
+									{[
+										dueLabel(task, timezone),
+										snapshot.projects.find(
+											(project) => project.id === task.project_id
+										)?.name,
+									]
+										.filter(Boolean)
+										.join(' · ')}
+									{task.due?.is_recurring && (
+										<Icon
+											name="refresh"
+											size={10}
+											className="inline-block ms-1"
+											aria-label={t('todoist.repeat')}
+										/>
+									)}
+								</span>
+							</button>
+							{overdue && (
+								<TodoistReschedule
+									ids={[task.id]}
+									taskName={task.content}
+									timezone={timezone}
+									busy={busy}
+									onReschedule={onReschedule}
+								/>
+							)}
+						</div>
 					</li>
 				)
 			})}

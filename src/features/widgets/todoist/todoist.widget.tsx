@@ -11,12 +11,14 @@ import { visibleCalendarEvents } from './utils/calendar-events'
 import { todoistTimeline } from './utils/task-timeline'
 import {
 	filterTodoistTasks,
+	isTodoistTaskOverdue,
 	todoistDateRange,
 	type TodoistTaskView,
 } from './utils/task-view'
 import { WidgetEmpty } from '../components/widget-empty'
 import { WidgetError } from '../components/widget-error'
 import { TodoistTaskList } from './components/todoist-task-list'
+import { TodoistReschedule } from './components/todoist-reschedule'
 import { useEffect, useState } from 'react'
 import Analytics from '@/analytics'
 import { t } from '@/common/i18n'
@@ -161,7 +163,15 @@ export function TodoistWidget() {
 		timezone,
 		project
 	)
-	const timeline = todoistTimeline(tasks, calendarCompletion.shown, timezone)
+	const overdue = tasks.filter((task) => isTodoistTaskOverdue(task, now, timezone))
+	const overdueIds = new Set(overdue.map((task) => task.id))
+	const timeline = todoistTimeline(
+		tasks.filter((task) => !overdueIds.has(task.id)),
+		calendarCompletion.shown,
+		timezone
+	)
+	const reschedule = (ids: string[], date: string) =>
+		perform({ action: 'reschedule', ids, date, timezone })
 	const emptyMessage =
 		taskView === 'today'
 			? t('todoist.todayEmpty')
@@ -403,6 +413,7 @@ export function TodoistWidget() {
 						) : (
 							<>
 								{timeline.length === 0 &&
+									overdue.length === 0 &&
 									!calendarCompletion.loading &&
 									(!calendarEnabled || !calendar.isFetching) &&
 									(error ? (
@@ -416,26 +427,71 @@ export function TodoistWidget() {
 											description={emptyMessage}
 										/>
 									))}
-								{snapshot && (
-									<TodoistTaskList
-										items={timeline}
-										timezone={timezone}
-										view={taskView}
-										calendarSaving={calendarCompletion.saving}
-										onCalendarComplete={(event) =>
-											void calendarCompletion.complete(event)
-										}
-										snapshot={snapshot}
-										busy={busy}
-										onEdit={openEditor}
-										onComplete={(id) =>
-											void perform({
-												action: 'complete',
-												id,
-											})
-										}
-									/>
-								)}
+								{snapshot &&
+									[
+										{
+											items: todoistTimeline(overdue, [], timezone),
+											overdue: true,
+										},
+										{ items: timeline, overdue: false },
+									]
+										.filter((group) => group.items.length > 0)
+										.map((group) => (
+											<section
+												key={`${view?.connectionId}:${project}:${taskView}:${timezone}:${group.overdue}`}
+												className="flex flex-col gap-1"
+											>
+												{group.overdue ? (
+													<div className="flex flex-wrap items-center justify-between gap-2 px-2">
+														<h4 className="text-2xs font-bold text-danger">
+															{t('todoist.overdue', {
+																count: overdue.length.toLocaleString(
+																	'fa-IR'
+																),
+															})}
+														</h4>
+														<TodoistReschedule
+															ids={overdue.map(
+																(task) => task.id
+															)}
+															bulk
+															timezone={timezone}
+															busy={busy}
+															onReschedule={reschedule}
+														/>
+													</div>
+												) : overdue.length > 0 &&
+													taskView === 'today' ? (
+													<h4 className="px-2 text-2xs font-bold text-fg-muted">
+														{t('todoist.today')}
+													</h4>
+												) : null}
+												<TodoistTaskList
+													items={group.items}
+													overdue={group.overdue}
+													onReschedule={reschedule}
+													timezone={timezone}
+													view={taskView}
+													calendarSaving={
+														calendarCompletion.saving
+													}
+													onCalendarComplete={(event) =>
+														void calendarCompletion.complete(
+															event
+														)
+													}
+													snapshot={snapshot}
+													busy={busy}
+													onEdit={openEditor}
+													onComplete={(id) =>
+														void perform({
+															action: 'complete',
+															id,
+														})
+													}
+												/>
+											</section>
+										))}
 
 								<TodoistCalendar
 									view={taskView}

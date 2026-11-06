@@ -60,7 +60,7 @@ Hooks need React, so they are not tested. Anything pure that a hook uses (parsin
 
 ## Todoist
 
-`todoist/` uses the external Todoist API directly with a bearer token, outside the Widgetify client. The background worker serializes requests through `todoist-client.ts`; `use-todoist.hook.ts` reads a token-free view and watches local snapshot changes. Sync reads and task commands share one endpoint. Failed requests preserve the snapshot, and HTTP 429 sets a cooldown.
+`todoist/` uses the external Todoist API directly with a bearer token, outside the Widgetify client. The background worker serializes requests through `todoist-client.ts`; `use-todoist.hook.ts` reads a token-free view and watches local snapshot changes. Sync reads and task commands share one endpoint. Rescheduling uses date-only item updates with stable IDs per selected task. `sync-batches.ts` sends groups of at most 100 commands, committing each response before advancing its cursor and reporting partial failures. Failed requests preserve the snapshot, and HTTP 429 sets a cooldown.
 
 The Google Calendar domain also provides `useRefreshGoogleCalendarEvents` in `date/get-google-calendar-events.hook.ts`. It uses the existing range query key and FRESH_REQUEST for explicit refreshes; the Todoist widget uses it alongside task sync.
 

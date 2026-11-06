@@ -81,3 +81,9 @@ Importing moment-hijri also sets the global moment locale to `ar-sa`. Bun runs e
 The shared local key `todoistAccount` holds the Todoist credential and sync snapshot for the background worker and task widget. Treat it as private account data; do not include it in analytics or a server request to Widgetify.
 
 `utils/read-file-data-url.ts` reads signed-out photo and wallpaper uploads for local storage. It rejects failed or cancelled reads. Analytics names from removed payment and upgrade actions stay in the historical list; the data-name test records them as retired instead of renaming them.
+
+## Device file selections
+
+The storage gateway also provides `getDeviceFileSelection` and `setDeviceFileSelection`. They use the `widgetify-device-files` IndexedDB database and its `selections` store so native file-system handles survive a Chrome restart. Keys remain typed on `StorageKV`; the startup feature uses `startupVideoDirectory` for its directory handle, enabled flag and last validated count. Writes finish only when the transaction commits, so a rejected replacement preserves the previous selection. These per-device records are independent of account sign-out and contain no copied media.
+
+`getSessionValue` and `setSessionValue` use browser session storage for the Chrome-only `startupVideoRequest` token. Worker restarts preserve it and browser session termination clears it. The background consumes it once. The `startupVideoWindowIds` session array records handled normal windows. The background compares it with live window IDs when a window opens, which avoids relying on shutdown writes. The former `startupVideoWindowsClosed` key remains declared for storage-name history; startup no longer reads it. `utils/normalize-startup-video.ts` validates the native handle methods and setting fields in both the dashboard and the background.

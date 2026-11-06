@@ -1,3 +1,4 @@
+import { startupVideo } from './startup-video'
 import { auth } from './auth'
 import { city } from './city'
 import { common } from './common'
@@ -19,6 +20,7 @@ import { widgets } from './widgets'
 import { todoist } from './todoist'
 
 export const fa = {
+	...startupVideo,
 	...auth,
 	...city,
 	...common,

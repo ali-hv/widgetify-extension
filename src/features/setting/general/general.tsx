@@ -1,3 +1,4 @@
+import { StartupVideoSetting } from '@/features/startup-video/startup-video-setting'
 import { t } from '@/common/i18n'
 import { SectionPanel, ToggleSwitch } from '@/components/ui'
 import { SelectCity } from '@/components/select-city'
@@ -37,6 +38,7 @@ export function GeneralSettingTab() {
 					/>
 				</div>
 			</SectionPanel>
+			{!import.meta.env.FIREFOX && <StartupVideoSetting />}
 			<StorageUsage />
 		</div>
 	)
